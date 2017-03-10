@@ -10,6 +10,7 @@ For specific benchmarks:
 
 ## Results
 
+```
 benchmarking Consing/Data.List 0..10
 time                 93.47 ns   (92.87 ns .. 94.13 ns)
                      1.000 R²   (0.999 R² .. 1.000 R²)
@@ -133,3 +134,4 @@ time                 8.870 ns   (8.689 ns .. 9.056 ns)
 mean                 8.734 ns   (8.641 ns .. 8.849 ns)
 std dev              341.9 ps   (254.7 ps .. 460.9 ps)
 variance introduced by outliers: 64% (severely inflated)
+```
