@@ -10,7 +10,6 @@ library
 benchmark containers
   default-language: Haskell2010
   type: exitcode-stdio-1.0
-  hs-source-dirs:    bench
   ghc-options:       -Wall -O2 -rtsopts
   main-is:           Main.hs
   build-depends:     base
