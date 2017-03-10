@@ -1,5 +1,12 @@
 # Sequences
 
+[Definition](https://en.wikipedia.org/wiki/List_(abstract_data_type)):
+
+> In computer science, a list or sequence is an abstract data type
+> that represents a countable number of ordered values, where the same
+> value may occur more than once. An instance of a list is a computer
+> representation of the mathematical concept of a finite sequence.
+
 For all benchmarks:
 
     $ stack bench :sequences
