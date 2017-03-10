@@ -71,18 +71,18 @@ time                 24.34 ms   (24.07 ms .. 24.54 ms)
                      1.000 R²   (0.999 R² .. 1.000 R²)
 mean                 24.62 ms   (24.48 ms .. 24.87 ms)
 std dev              385.9 μs   (231.2 μs .. 575.7 μs)
+```
 
+## Replicate
+
+```
 benchmarking Replicate/Data.List 0..10
 time                 8.778 ns   (8.730 ns .. 8.818 ns)
                      1.000 R²   (1.000 R² .. 1.000 R²)
 mean                 8.755 ns   (8.704 ns .. 8.821 ns)
 std dev              187.3 ps   (148.4 ps .. 236.5 ps)
 variance introduced by outliers: 34% (moderately inflated)
-```
 
-## Replicate
-
-```
 benchmarking Replicate/Data.Vector 0..10
 time                 8.671 ns   (8.577 ns .. 8.769 ns)
                      0.999 R²   (0.999 R² .. 0.999 R²)
