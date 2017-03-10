@@ -38,12 +38,14 @@ main = do
            , Replicator "Data.Vector.Unboxed" UV.replicate
            , Replicator "Data.Sequence" S.replicate
            ])
-    , bgroup "Indexing" (indexes 
-                         [ Indexing "Data.List" list (L.!! )
-                         , Indexing "Data.Vector" vector (V.!)
-                         , Indexing "Data.Vector.Unboxed" uvector (UV.!)
-                         , Indexing "Data.Sequence" seqd (S.index)
-                         ])
+    , bgroup
+        "Indexing"
+        (indexes
+           [ Indexing "Data.List" list (L.!!)
+           , Indexing "Data.Vector" vector (V.!)
+           , Indexing "Data.Vector.Unboxed" uvector (UV.!)
+           , Indexing "Data.Sequence" seqd (S.index)
+           ])
     ]
   where
     conses funcs =
@@ -52,25 +54,23 @@ main = do
       , Conser title func <- funcs
       ]
     replicators funcs =
-      [ bench (title ++ " " ++ show i) $ nf (\(x,y) -> func x y) (i,1234)
+      [ bench (title ++ " " ++ show i) $ nf (\(x, y) -> func x y) (i, 1234)
       | i <- [10, 1000, 10000]
       , Replicator title func <- funcs
       ]
     sampleList :: IO [Int]
-    sampleList = evaluate $ force [1..10000]
-    
+    sampleList = evaluate $ force [1 .. 10000]
     sampleVector :: IO (V.Vector Int)
     sampleVector = evaluate $ force $ V.generate 10000 id
-
     sampleUVVector :: IO (UV.Vector Int)
     sampleUVVector = evaluate $ force $ UV.generate 10000 id
-
     sampleSeq :: IO (S.Seq Int)
-    sampleSeq = evaluate $ force $ S.fromList [1..10000]
-
-    indexes funcs = [ bench (title ++ " " ++ show index) $ nf (\x -> func payload x) index
-                    | index <- [100, 1000, 9999]
-                    , Indexing title payload func <- funcs ]
+    sampleSeq = evaluate $ force $ S.fromList [1 .. 10000]
+    indexes funcs =
+      [ bench (title ++ " " ++ show index) $ nf (\x -> func payload x) index
+      | index <- [100, 1000, 8000]
+      , Indexing title payload func <- funcs
+      ]
 
 conslist :: Int -> [Int]
 conslist n0 = go n0 []
