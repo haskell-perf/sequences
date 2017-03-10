@@ -97,84 +97,84 @@ variance introduced by outliers: 30% (moderately inflated)
 ## Replicate
 
 ```
-benchmarking Replicate/Data.List 0..10
+benchmarking Replicate/Data.List 10
 time                 134.8 ns   (133.6 ns .. 136.0 ns)
                      0.999 R²   (0.998 R² .. 0.999 R²)
 mean                 135.4 ns   (133.9 ns .. 137.3 ns)
 std dev              5.437 ns   (4.415 ns .. 6.692 ns)
 variance introduced by outliers: 60% (severely inflated)
 
-benchmarking Replicate/Data.Vector 0..10
+benchmarking Replicate/Data.Vector 10
 time                 940.6 ns   (933.0 ns .. 948.5 ns)
                      0.999 R²   (0.998 R² .. 0.999 R²)
 mean                 946.6 ns   (934.9 ns .. 959.5 ns)
 std dev              42.02 ns   (34.93 ns .. 50.44 ns)
 variance introduced by outliers: 61% (severely inflated)
 
-benchmarking Replicate/Data.Vector.Unboxed 0..10
+benchmarking Replicate/Data.Vector.Unboxed 10
 time                 46.22 ns   (45.66 ns .. 46.76 ns)
                      0.999 R²   (0.998 R² .. 0.999 R²)
 mean                 46.60 ns   (46.00 ns .. 47.38 ns)
 std dev              2.303 ns   (1.681 ns .. 3.202 ns)
 variance introduced by outliers: 71% (severely inflated)
 
-benchmarking Replicate/Data.Sequence 0..10
+benchmarking Replicate/Data.Sequence 10
 time                 81.57 ns   (80.81 ns .. 82.46 ns)
                      0.999 R²   (0.999 R² .. 1.000 R²)
 mean                 81.88 ns   (81.06 ns .. 82.84 ns)
 std dev              2.969 ns   (2.500 ns .. 3.842 ns)
 variance introduced by outliers: 56% (severely inflated)
 
-benchmarking Replicate/Data.List 0..1000
+benchmarking Replicate/Data.List 1000
 time                 10.11 μs   (9.976 μs .. 10.25 μs)
                      0.999 R²   (0.998 R² .. 0.999 R²)
 mean                 10.12 μs   (10.01 μs .. 10.27 μs)
 std dev              429.2 ns   (345.6 ns .. 525.4 ns)
 variance introduced by outliers: 52% (severely inflated)
 
-benchmarking Replicate/Data.Vector 0..1000
+benchmarking Replicate/Data.Vector 1000
 time                 4.179 μs   (4.146 μs .. 4.227 μs)
                      0.999 R²   (0.998 R² .. 1.000 R²)
 mean                 4.186 μs   (4.148 μs .. 4.231 μs)
 std dev              136.7 ns   (114.5 ns .. 164.6 ns)
 variance introduced by outliers: 41% (moderately inflated)
 
-benchmarking Replicate/Data.Vector.Unboxed 0..1000
+benchmarking Replicate/Data.Vector.Unboxed 1000
 time                 801.9 ns   (793.0 ns .. 813.3 ns)
                      0.999 R²   (0.998 R² .. 0.999 R²)
 mean                 803.8 ns   (794.8 ns .. 816.2 ns)
 std dev              36.06 ns   (28.43 ns .. 55.22 ns)
 variance introduced by outliers: 62% (severely inflated)
 
-benchmarking Replicate/Data.Sequence 0..1000
+benchmarking Replicate/Data.Sequence 1000
 time                 9.725 μs   (9.631 μs .. 9.825 μs)
                      0.999 R²   (0.999 R² .. 0.999 R²)
 mean                 9.749 μs   (9.656 μs .. 9.881 μs)
 std dev              376.0 ns   (316.6 ns .. 452.8 ns)
 variance introduced by outliers: 48% (moderately inflated)
 
-benchmarking Replicate/Data.List 0..10000
+benchmarking Replicate/Data.List 10000
 time                 101.8 μs   (100.1 μs .. 103.5 μs)
                      0.998 R²   (0.997 R² .. 0.999 R²)
 mean                 101.5 μs   (100.2 μs .. 103.2 μs)
 std dev              4.875 μs   (3.820 μs .. 7.209 μs)
 variance introduced by outliers: 50% (moderately inflated)
 
-benchmarking Replicate/Data.Vector 0..10000
+benchmarking Replicate/Data.Vector 10000
 time                 30.86 μs   (30.44 μs .. 31.27 μs)
                      0.999 R²   (0.998 R² .. 0.999 R²)
 mean                 30.92 μs   (30.60 μs .. 31.28 μs)
 std dev              1.196 μs   (1.005 μs .. 1.492 μs)
 variance introduced by outliers: 44% (moderately inflated)
 
-benchmarking Replicate/Data.Vector.Unboxed 0..10000
+benchmarking Replicate/Data.Vector.Unboxed 10000
 time                 7.232 μs   (7.149 μs .. 7.312 μs)
                      0.999 R²   (0.998 R² .. 0.999 R²)
 mean                 7.228 μs   (7.155 μs .. 7.329 μs)
 std dev              297.3 ns   (234.7 ns .. 399.4 ns)
 variance introduced by outliers: 52% (severely inflated)
 
-benchmarking Replicate/Data.Sequence 0..10000
+benchmarking Replicate/Data.Sequence 10000
 time                 97.21 μs   (96.07 μs .. 98.65 μs)
                      0.998 R²   (0.997 R² .. 0.999 R²)
 mean                 97.44 μs   (96.39 μs .. 98.85 μs)
