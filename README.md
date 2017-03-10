@@ -7,6 +7,8 @@
 > value may occur more than once. An instance of a list is a computer
 > representation of the mathematical concept of a finite sequence.
 
+## Running
+
 For all benchmarks:
 
     $ stack bench :sequences
