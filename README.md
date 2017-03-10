@@ -17,6 +17,8 @@ For specific benchmarks:
 
     $ stack bench :time --benchmark-arguments Consing
 
+<!-- RESULTS -->
+
 ## Indexing
 
 ```
