@@ -40,7 +40,7 @@ main =
       , Conser title func <- funcs
       ]
     replicators funcs =
-      [ bench (title ++ " 0.." ++ show i) $ nf (\(x,y) -> func x y) (i,1234)
+      [ bench (title ++ " " ++ show i) $ nf (\(x,y) -> func x y) (i,1234)
       | i <- [10, 1000, 10000]
       , Replicator title func <- funcs
       ]
