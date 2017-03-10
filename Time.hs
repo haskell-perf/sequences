@@ -20,7 +20,7 @@ main = do
   list <- sampleList
   vector <- sampleVector
   uvector <- sampleUVVector
-  seq <- sampleSeq
+  seqd <- sampleSeq
   defaultMain
     [ bgroup
         "Consing"
@@ -42,7 +42,7 @@ main = do
                          [ Indexing "Data.List" list (L.!! )
                          , Indexing "Data.Vector" vector (V.!)
                          , Indexing "Data.Vector.Unboxed" uvector (UV.!)
-                         , Indexing "Data.Sequence" seq (S.index)
+                         , Indexing "Data.Sequence" seqd (S.index)
                          ])
     ]
   where
