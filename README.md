@@ -11,11 +11,11 @@ From [Wikipedia](https://en.wikipedia.org/wiki/List_(abstract_data_type)).
 
 For all benchmarks:
 
-    $ stack bench :sequences
+    $ stack bench :time
 
 For specific benchmarks:
 
-    $ stack bench :sequences --benchmark-arguments Consing
+    $ stack bench :time --benchmark-arguments Consing
 
 ## Consing
 
