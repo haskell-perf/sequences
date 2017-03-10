@@ -5,6 +5,7 @@ module Main (main) where
 
 import           Control.DeepSeq
 import           Control.Exception (evaluate)
+import           Control.Monad
 import           Criterion.Main
 import           Criterion.Measurement
 import           Criterion.Types
@@ -30,35 +31,35 @@ main = do
   vector <- sampleVector
   uvector <- sampleUVVector
   seqd <- sampleSeq
-  -- exists <- doesFileExist fp
-  -- when exists (removeFile fp)
-  -- defaultMainWith
-  --   defaultConfig {csvFile = Just fp}
-  --   [ bgroup
-  --       "Consing"
-  --       (conses
-  --          [ Conser "Data.List" conslist
-  --          , Conser "Data.Vector" consvector
-  --          , Conser "Data.Vector.Unboxed" consuvector
-  --          , Conser "Data.Sequence" consseq
-  --          ])
-  --   , bgroup
-  --       "Replicate"
-  --       (replicators
-  --          [ Replicator "Data.List" L.replicate
-  --          , Replicator "Data.Vector" V.replicate
-  --          , Replicator "Data.Vector.Unboxed" UV.replicate
-  --          , Replicator "Data.Sequence" S.replicate
-  --          ])
-  --   , bgroup
-  --       "Indexing"
-  --       (indexes
-  --          [ Indexing "Data.List" list (L.!!)
-  --          , Indexing "Data.Vector" vector (V.!)
-  --          , Indexing "Data.Vector.Unboxed" uvector (UV.!)
-  --          , Indexing "Data.Sequence" seqd (S.index)
-  --          ])
-  --   ]
+  exists <- doesFileExist fp
+  when exists (removeFile fp)
+  defaultMainWith
+    defaultConfig {csvFile = Just fp}
+    [ bgroup
+        "Consing"
+        (conses
+           [ Conser "Data.List" conslist
+           , Conser "Data.Vector" consvector
+           , Conser "Data.Vector.Unboxed" consuvector
+           , Conser "Data.Sequence" consseq
+           ])
+    , bgroup
+        "Replicate"
+        (replicators
+           [ Replicator "Data.List" L.replicate
+           , Replicator "Data.Vector" V.replicate
+           , Replicator "Data.Vector.Unboxed" UV.replicate
+           , Replicator "Data.Sequence" S.replicate
+           ])
+    , bgroup
+        "Indexing"
+        (indexes
+           [ Indexing "Data.List" list (L.!!)
+           , Indexing "Data.Vector" vector (V.!)
+           , Indexing "Data.Vector.Unboxed" uvector (UV.!)
+           , Indexing "Data.Sequence" seqd (S.index)
+           ])
+    ]
   reportFromCsv fp
   where
     conses funcs =
