@@ -8,7 +8,7 @@ For specific benchmarks:
 
     $ stack bench :containers --benchmark-arguments Consing
 
-## Results
+## Consing
 
 ```
 benchmarking Consing/Data.List 0..10
@@ -78,7 +78,11 @@ time                 8.778 ns   (8.730 ns .. 8.818 ns)
 mean                 8.755 ns   (8.704 ns .. 8.821 ns)
 std dev              187.3 ps   (148.4 ps .. 236.5 ps)
 variance introduced by outliers: 34% (moderately inflated)
+```
 
+## Replicate
+
+```
 benchmarking Replicate/Data.Vector 0..10
 time                 8.671 ns   (8.577 ns .. 8.769 ns)
                      0.999 R²   (0.999 R² .. 0.999 R²)
