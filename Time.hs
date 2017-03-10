@@ -8,8 +8,10 @@ import           Control.Exception (evaluate)
 import           Criterion.Main
 import           Criterion.Measurement
 import           Criterion.Types
+import           Data.Function
 import           Data.List
 import qualified Data.List as L
+import           Data.Ord
 import qualified Data.Sequence as S
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as UV
@@ -28,35 +30,35 @@ main = do
   vector <- sampleVector
   uvector <- sampleUVVector
   seqd <- sampleSeq
-  exists <- doesFileExist fp
-  when exists (removeFile fp)
-  defaultMainWith
-    defaultConfig {csvFile = Just fp}
-    [ bgroup
-        "Consing"
-        (conses
-           [ Conser "Data.List" conslist
-           , Conser "Data.Vector" consvector
-           , Conser "Data.Vector.Unboxed" consuvector
-           , Conser "Data.Sequence" consseq
-           ])
-    , bgroup
-        "Replicate"
-        (replicators
-           [ Replicator "Data.List" L.replicate
-           , Replicator "Data.Vector" V.replicate
-           , Replicator "Data.Vector.Unboxed" UV.replicate
-           , Replicator "Data.Sequence" S.replicate
-           ])
-    , bgroup
-        "Indexing"
-        (indexes
-           [ Indexing "Data.List" list (L.!!)
-           , Indexing "Data.Vector" vector (V.!)
-           , Indexing "Data.Vector.Unboxed" uvector (UV.!)
-           , Indexing "Data.Sequence" seqd (S.index)
-           ])
-    ]
+  -- exists <- doesFileExist fp
+  -- when exists (removeFile fp)
+  -- defaultMainWith
+  --   defaultConfig {csvFile = Just fp}
+  --   [ bgroup
+  --       "Consing"
+  --       (conses
+  --          [ Conser "Data.List" conslist
+  --          , Conser "Data.Vector" consvector
+  --          , Conser "Data.Vector.Unboxed" consuvector
+  --          , Conser "Data.Sequence" consseq
+  --          ])
+  --   , bgroup
+  --       "Replicate"
+  --       (replicators
+  --          [ Replicator "Data.List" L.replicate
+  --          , Replicator "Data.Vector" V.replicate
+  --          , Replicator "Data.Vector.Unboxed" UV.replicate
+  --          , Replicator "Data.Sequence" S.replicate
+  --          ])
+  --   , bgroup
+  --       "Indexing"
+  --       (indexes
+  --          [ Indexing "Data.List" list (L.!!)
+  --          , Indexing "Data.Vector" vector (V.!)
+  --          , Indexing "Data.Vector.Unboxed" uvector (UV.!)
+  --          , Indexing "Data.Sequence" seqd (S.index)
+  --          ])
+  --   ]
   reportFromCsv fp
   where
     conses funcs =
@@ -109,12 +111,22 @@ reportFromCsv fp = do
     Left e -> print e
     Right (_:rows) -> do
       !readme <- fmap force (readFile "README.md")
-      let sep = "<!-- RESULTS -->\n"
-          before = unlines (takeWhile (/= sep) (lines readme) ++ [sep])
-      writeFile "README.md" (before ++ format rows)
+      let sep = "<!-- RESULTS -->"
+          before = unlines (takeWhile (/= sep) (lines readme) ++ [sep ++ "\n"])
+      writeFile
+        "README.md"
+        (before ++
+         unlines
+           (map
+              format
+              (filter
+                 (not . null . filter (not . null))
+                 (groupBy (on (==) (takeWhile (/= '/') . concat . take 1)) rows))))
 
+format :: [[String]] -> String
 format rows =
-  unlines ["|Name|Mean|Min|Max|Stddev|", "|---|---|---|---|---|"] ++
+  ("## " ++ takeWhile (/= '/') (concat (concat (take 1 (drop 1 rows))))) ++
+  "\n\n" ++ unlines ["|Name|Mean|Min|Max|Stddev|", "|---|---|---|---|---|"] ++
   unlines
     (map
        (\x ->
@@ -123,7 +135,12 @@ format rows =
               "|" ++
               intercalate
                 " | "
-                [name, float mean, float min, float max, float stddev] ++
+                [ dropWhile (== '/') (dropWhile (/= '/') name)
+                , float mean
+                , float min
+                , float max
+                , float stddev
+                ] ++
               "|"
             k -> error (show k))
        (filter (not . null . filter (not . null)) rows))
