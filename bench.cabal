@@ -19,3 +19,4 @@ benchmark time
                    , criterion
                    , deepseq
                    , containers
+                   , csv

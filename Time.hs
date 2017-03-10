@@ -4,12 +4,18 @@
 module Main (main) where
 
 import           Control.DeepSeq
+import           Control.Exception (evaluate)
 import           Criterion.Main
+import           Criterion.Measurement
+import           Criterion.Types
+import           Data.List
 import qualified Data.List as L
+import qualified Data.Sequence as S
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as UV
-import qualified Data.Sequence as S
-import Control.Exception (evaluate)
+import           System.Directory
+import           System.Environment
+import           Text.CSV
 
 data Conser = forall f. NFData (f Int) => Conser String (Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
@@ -17,11 +23,15 @@ data Indexing = forall f. NFData (f Int) => Indexing String (f Int) (f Int -> In
 
 main :: IO ()
 main = do
+  let fp = "out.csv"
   list <- sampleList
   vector <- sampleVector
   uvector <- sampleUVVector
   seqd <- sampleSeq
-  defaultMain
+  exists <- doesFileExist fp
+  when exists (removeFile fp)
+  defaultMainWith
+    defaultConfig {csvFile = Just fp}
     [ bgroup
         "Consing"
         (conses
@@ -47,6 +57,7 @@ main = do
            , Indexing "Data.Sequence" seqd (S.index)
            ])
     ]
+  reportFromCsv fp
   where
     conses funcs =
       [ bench (title ++ " 0.." ++ show i) $ nf func i
@@ -91,3 +102,30 @@ consseq :: Int -> S.Seq Int
 consseq n0 = go n0 S.empty
   where go 0 acc = acc
         go n !acc = go (n - 1) (n S.<| acc)
+
+reportFromCsv fp = do
+  result <- parseCSVFromFile fp
+  case result of
+    Left e -> print e
+    Right (_:rows) -> do
+      !readme <- fmap force (readFile "README.md")
+      let sep = "<!-- RESULTS -->\n"
+          before = unlines (takeWhile (/= sep) (lines readme) ++ [sep])
+      writeFile "README.md" (before ++ format rows)
+
+format rows =
+  unlines ["|Name|Mean|Min|Max|Stddev|", "|---|---|---|---|---|"] ++
+  unlines
+    (map
+       (\x ->
+          case x of
+            (name:mean:min:max:stddev:_) ->
+              "|" ++
+              intercalate
+                " | "
+                [name, float mean, float min, float max, float stddev] ++
+              "|"
+            k -> error (show k))
+       (filter (not . null . filter (not . null)) rows))
+
+float x = secs (read x)
