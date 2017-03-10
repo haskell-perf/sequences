@@ -1,12 +1,12 @@
-# Containers
+# Sequences
 
 For all benchmarks:
 
-    $ stack bench :containers
+    $ stack bench :sequences
 
 For specific benchmarks:
 
-    $ stack bench :containers --benchmark-arguments Consing
+    $ stack bench :sequences --benchmark-arguments Consing
 
 ## Consing
 
