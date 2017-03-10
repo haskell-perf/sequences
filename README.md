@@ -12,130 +12,172 @@ For specific benchmarks:
 
 ```
 benchmarking Consing/Data.List 0..10
-time                 93.47 ns   (92.87 ns .. 94.13 ns)
-                     1.000 R²   (0.999 R² .. 1.000 R²)
-mean                 93.16 ns   (92.60 ns .. 93.87 ns)
-std dev              2.082 ns   (1.647 ns .. 2.858 ns)
-variance introduced by outliers: 32% (moderately inflated)
+time                 95.48 ns   (94.29 ns .. 96.55 ns)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 96.40 ns   (95.19 ns .. 98.21 ns)
+std dev              5.079 ns   (3.702 ns .. 7.780 ns)
+variance introduced by outliers: 73% (severely inflated)
 
 benchmarking Consing/Data.Vector 0..10
-time                 392.2 ns   (388.7 ns .. 396.4 ns)
+time                 403.1 ns   (399.1 ns .. 406.9 ns)
                      0.999 R²   (0.999 R² .. 1.000 R²)
-mean                 398.0 ns   (393.5 ns .. 404.6 ns)
-std dev              18.63 ns   (13.55 ns .. 26.47 ns)
-variance introduced by outliers: 65% (severely inflated)
+mean                 404.7 ns   (401.3 ns .. 408.2 ns)
+std dev              12.08 ns   (10.32 ns .. 14.51 ns)
+variance introduced by outliers: 43% (moderately inflated)
 
 benchmarking Consing/Data.Vector.Unboxed 0..10
-time                 327.3 ns   (323.1 ns .. 333.6 ns)
-                     0.998 R²   (0.998 R² .. 0.999 R²)
-mean                 331.7 ns   (327.3 ns .. 336.6 ns)
-std dev              15.66 ns   (14.10 ns .. 17.69 ns)
-variance introduced by outliers: 66% (severely inflated)
+time                 320.7 ns   (317.4 ns .. 324.3 ns)
+                     0.999 R²   (0.999 R² .. 0.999 R²)
+mean                 320.1 ns   (317.0 ns .. 323.6 ns)
+std dev              10.91 ns   (9.750 ns .. 12.88 ns)
+variance introduced by outliers: 50% (moderately inflated)
+
+benchmarking Consing/Data.Sequence 0..10
+time                 204.1 ns   (201.7 ns .. 206.8 ns)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 204.4 ns   (202.0 ns .. 207.4 ns)
+std dev              9.285 ns   (7.624 ns .. 11.50 ns)
+variance introduced by outliers: 65% (severely inflated)
 
 benchmarking Consing/Data.List 0..1000
-time                 9.094 μs   (9.027 μs .. 9.182 μs)
-                     0.999 R²   (0.999 R² .. 1.000 R²)
-mean                 9.102 μs   (9.018 μs .. 9.215 μs)
-std dev              318.3 ns   (229.0 ns .. 435.5 ns)
-variance introduced by outliers: 42% (moderately inflated)
+time                 9.320 μs   (9.236 μs .. 9.416 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 9.377 μs   (9.257 μs .. 9.524 μs)
+std dev              420.8 ns   (338.1 ns .. 570.7 ns)
+variance introduced by outliers: 55% (severely inflated)
 
 benchmarking Consing/Data.Vector 0..1000
-time                 509.1 μs   (504.9 μs .. 513.8 μs)
-                     0.999 R²   (0.999 R² .. 0.999 R²)
-mean                 512.5 μs   (508.5 μs .. 517.7 μs)
-std dev              15.54 μs   (12.83 μs .. 20.42 μs)
-variance introduced by outliers: 23% (moderately inflated)
+time                 534.0 μs   (525.1 μs .. 541.1 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 533.0 μs   (527.3 μs .. 540.3 μs)
+std dev              22.28 μs   (18.98 μs .. 26.99 μs)
+variance introduced by outliers: 35% (moderately inflated)
 
 benchmarking Consing/Data.Vector.Unboxed 0..1000
-time                 224.3 μs   (221.6 μs .. 226.7 μs)
-                     0.999 R²   (0.999 R² .. 0.999 R²)
-mean                 223.6 μs   (222.1 μs .. 225.2 μs)
-std dev              5.376 μs   (4.403 μs .. 6.613 μs)
-variance introduced by outliers: 18% (moderately inflated)
+time                 233.7 μs   (230.9 μs .. 237.5 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 234.9 μs   (231.9 μs .. 238.8 μs)
+std dev              11.84 μs   (8.748 μs .. 15.76 μs)
+variance introduced by outliers: 48% (moderately inflated)
+
+benchmarking Consing/Data.Sequence 0..1000
+time                 35.32 μs   (34.95 μs .. 35.66 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 35.70 μs   (35.25 μs .. 36.38 μs)
+std dev              1.834 μs   (1.263 μs .. 3.103 μs)
+variance introduced by outliers: 57% (severely inflated)
 
 benchmarking Consing/Data.List 0..10000
-time                 159.2 μs   (157.9 μs .. 160.6 μs)
-                     0.999 R²   (0.999 R² .. 1.000 R²)
-mean                 160.0 μs   (158.9 μs .. 161.4 μs)
-std dev              3.978 μs   (3.467 μs .. 4.973 μs)
-variance introduced by outliers: 20% (moderately inflated)
+time                 164.8 μs   (163.4 μs .. 166.3 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 165.3 μs   (163.6 μs .. 167.2 μs)
+std dev              6.240 μs   (5.276 μs .. 7.403 μs)
+variance introduced by outliers: 36% (moderately inflated)
 
 benchmarking Consing/Data.Vector 0..10000
-time                 73.53 ms   (72.46 ms .. 74.48 ms)
+time                 77.27 ms   (75.82 ms .. 78.34 ms)
                      1.000 R²   (0.999 R² .. 1.000 R²)
-mean                 73.37 ms   (73.00 ms .. 73.97 ms)
-std dev              790.8 μs   (447.2 μs .. 1.239 ms)
+mean                 77.22 ms   (76.84 ms .. 77.82 ms)
+std dev              753.6 μs   (460.2 μs .. 1.111 ms)
 
 benchmarking Consing/Data.Vector.Unboxed 0..10000
-time                 24.34 ms   (24.07 ms .. 24.54 ms)
-                     1.000 R²   (0.999 R² .. 1.000 R²)
-mean                 24.62 ms   (24.48 ms .. 24.87 ms)
-std dev              385.9 μs   (231.2 μs .. 575.7 μs)
+time                 25.12 ms   (24.49 ms .. 25.72 ms)
+                     0.998 R²   (0.996 R² .. 0.999 R²)
+mean                 25.35 ms   (25.04 ms .. 25.89 ms)
+std dev              890.0 μs   (462.2 μs .. 1.300 ms)
+
+benchmarking Consing/Data.Sequence 0..10000
+time                 768.5 μs   (758.9 μs .. 776.1 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 769.0 μs   (761.2 μs .. 779.2 μs)
+std dev              30.35 μs   (22.64 μs .. 46.56 μs)
+variance introduced by outliers: 30% (moderately inflated)
 ```
 
 ## Replicate
 
 ```
 benchmarking Replicate/Data.List 0..10
-time                 8.778 ns   (8.730 ns .. 8.818 ns)
-                     1.000 R²   (1.000 R² .. 1.000 R²)
-mean                 8.755 ns   (8.704 ns .. 8.821 ns)
-std dev              187.3 ps   (148.4 ps .. 236.5 ps)
-variance introduced by outliers: 34% (moderately inflated)
+time                 134.8 ns   (133.6 ns .. 136.0 ns)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 135.4 ns   (133.9 ns .. 137.3 ns)
+std dev              5.437 ns   (4.415 ns .. 6.692 ns)
+variance introduced by outliers: 60% (severely inflated)
 
 benchmarking Replicate/Data.Vector 0..10
-time                 8.671 ns   (8.577 ns .. 8.769 ns)
-                     0.999 R²   (0.999 R² .. 0.999 R²)
-mean                 8.697 ns   (8.626 ns .. 8.792 ns)
-std dev              290.0 ps   (207.1 ps .. 473.2 ps)
-variance introduced by outliers: 56% (severely inflated)
-
-benchmarking Replicate/Data.Vector.Unboxed 0..10
-time                 8.567 ns   (8.503 ns .. 8.649 ns)
-                     0.999 R²   (0.999 R² .. 1.000 R²)
-mean                 8.611 ns   (8.556 ns .. 8.709 ns)
-std dev              235.5 ps   (176.5 ps .. 324.7 ps)
-variance introduced by outliers: 46% (moderately inflated)
-
-benchmarking Replicate/Data.List 0..1000
-time                 8.736 ns   (8.667 ns .. 8.813 ns)
-                     0.999 R²   (0.999 R² .. 0.999 R²)
-mean                 8.790 ns   (8.696 ns .. 8.905 ns)
-std dev              344.8 ps   (288.5 ps .. 427.3 ps)
-variance introduced by outliers: 64% (severely inflated)
-
-benchmarking Replicate/Data.Vector 0..1000
-time                 8.731 ns   (8.664 ns .. 8.789 ns)
-                     0.999 R²   (0.999 R² .. 1.000 R²)
-mean                 8.751 ns   (8.679 ns .. 8.843 ns)
-std dev              271.3 ps   (196.4 ps .. 396.8 ps)
-variance introduced by outliers: 52% (severely inflated)
-
-benchmarking Replicate/Data.Vector.Unboxed 0..1000
-time                 8.993 ns   (8.874 ns .. 9.096 ns)
+time                 940.6 ns   (933.0 ns .. 948.5 ns)
                      0.999 R²   (0.998 R² .. 0.999 R²)
-mean                 8.914 ns   (8.806 ns .. 9.062 ns)
-std dev              425.2 ps   (359.5 ps .. 532.0 ps)
-variance introduced by outliers: 72% (severely inflated)
-
-benchmarking Replicate/Data.List 0..10000
-time                 9.484 ns   (9.328 ns .. 9.623 ns)
-                     0.998 R²   (0.997 R² .. 0.999 R²)
-mean                 9.350 ns   (9.192 ns .. 9.510 ns)
-std dev              532.0 ps   (456.4 ps .. 623.2 ps)
-variance introduced by outliers: 79% (severely inflated)
-
-benchmarking Replicate/Data.Vector 0..10000
-time                 8.711 ns   (8.659 ns .. 8.766 ns)
-                     0.999 R²   (0.999 R² .. 1.000 R²)
-mean                 8.808 ns   (8.730 ns .. 8.921 ns)
-std dev              325.1 ps   (232.7 ps .. 478.5 ps)
+mean                 946.6 ns   (934.9 ns .. 959.5 ns)
+std dev              42.02 ns   (34.93 ns .. 50.44 ns)
 variance introduced by outliers: 61% (severely inflated)
 
+benchmarking Replicate/Data.Vector.Unboxed 0..10
+time                 46.22 ns   (45.66 ns .. 46.76 ns)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 46.60 ns   (46.00 ns .. 47.38 ns)
+std dev              2.303 ns   (1.681 ns .. 3.202 ns)
+variance introduced by outliers: 71% (severely inflated)
+
+benchmarking Replicate/Data.Sequence 0..10
+time                 81.57 ns   (80.81 ns .. 82.46 ns)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 81.88 ns   (81.06 ns .. 82.84 ns)
+std dev              2.969 ns   (2.500 ns .. 3.842 ns)
+variance introduced by outliers: 56% (severely inflated)
+
+benchmarking Replicate/Data.List 0..1000
+time                 10.11 μs   (9.976 μs .. 10.25 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 10.12 μs   (10.01 μs .. 10.27 μs)
+std dev              429.2 ns   (345.6 ns .. 525.4 ns)
+variance introduced by outliers: 52% (severely inflated)
+
+benchmarking Replicate/Data.Vector 0..1000
+time                 4.179 μs   (4.146 μs .. 4.227 μs)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 4.186 μs   (4.148 μs .. 4.231 μs)
+std dev              136.7 ns   (114.5 ns .. 164.6 ns)
+variance introduced by outliers: 41% (moderately inflated)
+
+benchmarking Replicate/Data.Vector.Unboxed 0..1000
+time                 801.9 ns   (793.0 ns .. 813.3 ns)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 803.8 ns   (794.8 ns .. 816.2 ns)
+std dev              36.06 ns   (28.43 ns .. 55.22 ns)
+variance introduced by outliers: 62% (severely inflated)
+
+benchmarking Replicate/Data.Sequence 0..1000
+time                 9.725 μs   (9.631 μs .. 9.825 μs)
+                     0.999 R²   (0.999 R² .. 0.999 R²)
+mean                 9.749 μs   (9.656 μs .. 9.881 μs)
+std dev              376.0 ns   (316.6 ns .. 452.8 ns)
+variance introduced by outliers: 48% (moderately inflated)
+
+benchmarking Replicate/Data.List 0..10000
+time                 101.8 μs   (100.1 μs .. 103.5 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 101.5 μs   (100.2 μs .. 103.2 μs)
+std dev              4.875 μs   (3.820 μs .. 7.209 μs)
+variance introduced by outliers: 50% (moderately inflated)
+
+benchmarking Replicate/Data.Vector 0..10000
+time                 30.86 μs   (30.44 μs .. 31.27 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 30.92 μs   (30.60 μs .. 31.28 μs)
+std dev              1.196 μs   (1.005 μs .. 1.492 μs)
+variance introduced by outliers: 44% (moderately inflated)
+
 benchmarking Replicate/Data.Vector.Unboxed 0..10000
-time                 8.870 ns   (8.689 ns .. 9.056 ns)
-                     0.998 R²   (0.996 R² .. 0.999 R²)
-mean                 8.734 ns   (8.641 ns .. 8.849 ns)
-std dev              341.9 ps   (254.7 ps .. 460.9 ps)
-variance introduced by outliers: 64% (severely inflated)
+time                 7.232 μs   (7.149 μs .. 7.312 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 7.228 μs   (7.155 μs .. 7.329 μs)
+std dev              297.3 ns   (234.7 ns .. 399.4 ns)
+variance introduced by outliers: 52% (severely inflated)
+
+benchmarking Replicate/Data.Sequence 0..10000
+time                 97.21 μs   (96.07 μs .. 98.65 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 97.44 μs   (96.39 μs .. 98.85 μs)
+std dev              4.150 μs   (3.562 μs .. 5.121 μs)
+variance introduced by outliers: 44% (moderately inflated)
 ```

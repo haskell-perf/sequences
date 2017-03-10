@@ -18,3 +18,4 @@ benchmark containers
                    , ghc-prim
                    , criterion
                    , deepseq
+                   , containers

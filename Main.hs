@@ -8,6 +8,7 @@ import           Criterion.Main
 import qualified Data.List as L
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as UV
+import qualified Data.Sequence as S
 
 data Conser = forall f. NFData (f Int) => Conser String (Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
@@ -21,6 +22,7 @@ main =
            [ Conser "Data.List" conslist
            , Conser "Data.Vector" consvector
            , Conser "Data.Vector.Unboxed" consuvector
+           , Conser "Data.Sequence" consseq
            ])
     , bgroup
         "Replicate"
@@ -28,18 +30,18 @@ main =
            [ Replicator "Data.List" L.replicate
            , Replicator "Data.Vector" V.replicate
            , Replicator "Data.Vector.Unboxed" UV.replicate
+           , Replicator "Data.Sequence" S.replicate
            ])
     ]
   where
-    iterations = [10, 1000, 10000]
     conses funcs =
       [ bench (title ++ " 0.." ++ show i) $ nf func i
-      | i <- iterations
+      | i <- [10, 1000, 10000]
       , Conser title func <- funcs
       ]
     replicators funcs =
-      [ bench (title ++ " 0.." ++ show i) $ nf func i
-      | i <- iterations
+      [ bench (title ++ " 0.." ++ show i) $ nf (\(x,y) -> func x y) (i,1234)
+      | i <- [10, 1000, 10000]
       , Replicator title func <- funcs
       ]
 
@@ -57,3 +59,8 @@ consuvector :: Int -> UV.Vector Int
 consuvector n0 = go n0 UV.empty
   where go 0 acc = acc
         go n !acc = go (n - 1) (UV.cons n acc)
+
+consseq :: Int -> S.Seq Int
+consseq n0 = go n0 S.empty
+  where go 0 acc = acc
+        go n !acc = go (n - 1) (n S.<| acc)
