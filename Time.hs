@@ -7,18 +7,12 @@ import           Control.DeepSeq
 import           Control.Exception (evaluate)
 import           Control.Monad
 import           Criterion.Main
-import           Criterion.Measurement
 import           Criterion.Types
-import           Data.Function
-import           Data.List
 import qualified Data.List as L
-import           Data.Ord
 import qualified Data.Sequence as S
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as UV
 import           System.Directory
-import           System.Environment
-import           Text.CSV
 
 data Conser = forall f. NFData (f Int) => Conser String (Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
@@ -35,7 +29,7 @@ main = do
   exists <- doesFileExist fp
   when exists (removeFile fp)
   defaultMainWith
-    defaultConfig {csvFile = Just fp}
+    defaultConfig {csvFile = Just fp, regressions= [(["regress"], "allocated:iters")]}
     [ bgroup
         "Consing"
         (conses
@@ -61,7 +55,7 @@ main = do
            , Indexing "Data.Sequence" seqd (S.index)
            ])
     , bgroup
-        "Length (Size: 10000)"
+        "Length"
         (lengths
            [ Length "Data.List" list (L.length)
            , Length "Data.Vector" vector (V.length)
@@ -69,35 +63,34 @@ main = do
            , Length "Data.Sequence" seqd (S.length)
            ])
     ]
-  reportFromCsv fp
   where
     conses funcs =
-      [ bench (title ++ " 0.." ++ show i) $ nf func i
-      | i <- [10, 1000, 10000]
+      [ bench (title ++ ":" ++ show i) $ nf func i
+      | i <- [10, 100, 1000, 10000]
       , Conser title func <- funcs
       ]
     replicators funcs =
-      [ bench (title ++ " " ++ show i) $ nf (\(x, y) -> func x y) (i, 1234)
-      | i <- [10, 1000, 10000]
+      [ bench (title ++ ":" ++ show i) $ nf (\(x, y) -> func x y) (i, 1234)
+      | i <- [10, 100, 1000, 10000]
       , Replicator title func <- funcs
       ]
     indexes funcs =
-      [ bench (title ++ " " ++ show index) $ nf (\x -> func payload x) index
-      | index <- [100, 1000, 8000]
+      [ bench (title ++ ":" ++ show index) $ nf (\x -> func payload x) index
+      | index <- [10, 100, 1000, 10000]
       , Indexing title payload func <- funcs
       ]
     lengths funcs =
-      [ bench title $ nf (\x -> func x) payload
+      [ bench (title ++ ":10000") $ nf (\x -> func x) payload
       | Length title payload func <- funcs
       ]
     sampleList :: IO [Int]
-    sampleList = evaluate $ force [1 .. 10000]
+    sampleList = evaluate $ force [1 .. 10005]
     sampleVector :: IO (V.Vector Int)
-    sampleVector = evaluate $ force $ V.generate 10000 id
+    sampleVector = evaluate $ force $ V.generate 10005 id
     sampleUVVector :: IO (UV.Vector Int)
-    sampleUVVector = evaluate $ force $ UV.generate 10000 id
+    sampleUVVector = evaluate $ force $ UV.generate 10005 id
     sampleSeq :: IO (S.Seq Int)
-    sampleSeq = evaluate $ force $ S.fromList [1 .. 10000]
+    sampleSeq = evaluate $ force $ S.fromList [1 .. 10005]
 
 conslist :: Int -> [Int]
 conslist n0 = go n0 []
@@ -118,45 +111,3 @@ consseq :: Int -> S.Seq Int
 consseq n0 = go n0 S.empty
   where go 0 acc = acc
         go n !acc = go (n - 1) (n S.<| acc)
-
-reportFromCsv fp = do
-  result <- parseCSVFromFile fp
-  case result of
-    Left e -> print e
-    Right (_:rows) -> do
-      !readme <- fmap force (readFile "README.md")
-      let sep = "<!-- RESULTS -->"
-          before = unlines (takeWhile (/= sep) (lines readme) ++ [sep ++ "\n"])
-      writeFile
-        "README.md"
-        (before ++
-         unlines
-           (map
-              format
-              (filter
-                 (not . null . filter (not . null))
-                 (groupBy (on (==) (takeWhile (/= '/') . concat . take 1)) rows))))
-
-format :: [[String]] -> String
-format rows =
-  ("## " ++ takeWhile (/= '/') (concat (concat (take 1 (drop 1 rows))))) ++
-  "\n\n" ++ unlines ["|Name|Mean|Min|Max|Stddev|", "|---|---|---|---|---|"] ++
-  unlines
-    (map
-       (\x ->
-          case x of
-            (name:mean:min:max:stddev:_) ->
-              "|" ++
-              intercalate
-                " | "
-                [ dropWhile (== '/') (dropWhile (/= '/') name)
-                , float mean
-                , float min
-                , float max
-                , float stddev
-                ] ++
-              "|"
-            k -> error (show k))
-       (filter (not . null . filter (not . null)) rows))
-
-float x = secs (read x)
