@@ -22,6 +22,7 @@ data Min = forall f. NFData (f Int) => Min String (f Int) (f Int -> Int)
 data Max = forall f. NFData (f Int) => Max String (f Int) (f Int -> Int)
 data Sort = forall f. NFData (f Int) => Sort String (f Int) (f Int -> f Int)
 data RemoveElement = forall f. NFData (f Int) => RemoveElement String (f Int) ((Int -> Bool) -> f Int -> f Int)
+data RemoveByIndex = forall f. NFData (f Int) => RemoveByIndex String (f Int) ((Int -> Int -> Bool) -> f Int -> f Int)
 
 main :: IO ()
 main = do
@@ -94,6 +95,12 @@ main = do
            , RemoveElement "Data.Vector.Unboxed" uvector (UV.filter)
            , RemoveElement "Data.Sequence" seqd (S.filter)
            ])
+    , bgroup
+        "Remove By Index"
+        (removeByIndexes
+         [ RemoveByIndex "Data.Vector" vector (V.ifilter)
+         , RemoveByIndex "Data.Vector.Unboxed" uvector (UV.ifilter)
+         ])
     ]
   where
     conses funcs =
@@ -132,6 +139,12 @@ main = do
       | relem <- [1, 100, 1000, 10000 :: Int]
       , RemoveElement title payload func <- funcs
       ]
+    removeByIndexes funcs =
+      [ bench (title ++ ":" ++ show relem) $ nf (\x -> func (\index _ -> index /= relem) x) payload
+      | relem <- [1, 100, 1000, 10000 :: Int]
+      , RemoveByIndex title payload func <- funcs
+      ]
+    
     sampleList :: IO [Int]
     sampleList = evaluate $ force [1 .. 10005]
     sampleVector :: IO (V.Vector Int)
