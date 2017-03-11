@@ -18,6 +18,11 @@ data Conser = forall f. NFData (f Int) => Conser String (Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
 data Indexing = forall f. NFData (f Int) => Indexing String (f Int) (f Int -> Int -> Int)
 data Length = forall f. NFData (f Int) => Length String (f Int) (f Int -> Int)
+data Min = forall f. NFData (f Int) => Min String (f Int) (f Int -> Int)
+data Max = forall f. NFData (f Int) => Max String (f Int) (f Int -> Int)
+data Sort = forall f. NFData (f Int) => Sort String (f Int) (f Int -> f Int)
+data RemoveElement = forall f. NFData (f Int) => RemoveElement String (f Int) ((Int -> Bool) -> f Int -> f Int)
+data RemoveByIndex = forall f. NFData (f Int) => RemoveByIndex String (f Int) ((Int -> Int -> Bool) -> f Int -> f Int)
 
 main :: IO ()
 main = do
@@ -62,6 +67,40 @@ main = do
            , Length "Data.Vector.Unboxed" uvector (UV.length)
            , Length "Data.Sequence" seqd (S.length)
            ])
+    , bgroup
+        "Min"
+        (mins
+           [ Min "Data.List" list (L.minimum)
+           , Min "Data.Vector" vector (V.minimum)
+           , Min "Data.Vector.Unboxed" uvector (UV.minimum)
+           ])
+    , bgroup
+        "Max"
+        (maxs
+           [ Max "Data.List" list (L.maximum)
+           , Max "Data.Vector" vector (V.maximum)
+           , Max "Data.Vector.Unboxed" uvector (UV.maximum)
+           ])
+    , bgroup
+        "Sort"
+        (sorts
+           [ Sort "Data.List" list (L.sort)
+           , Sort "Data.Sequence" seqd (S.sort)
+           ])
+    , bgroup
+        "Remove Element"
+        (removeElems
+           [ RemoveElement "Data.List" list (L.filter)
+           , RemoveElement "Data.Vector" vector (V.filter)
+           , RemoveElement "Data.Vector.Unboxed" uvector (UV.filter)
+           , RemoveElement "Data.Sequence" seqd (S.filter)
+           ])
+    , bgroup
+        "Remove By Index"
+        (removeByIndexes
+         [ RemoveByIndex "Data.Vector" vector (V.ifilter)
+         , RemoveByIndex "Data.Vector.Unboxed" uvector (UV.ifilter)
+         ])
     ]
   where
     conses funcs =
@@ -83,6 +122,29 @@ main = do
       [ bench (title ++ ":10000") $ nf (\x -> func x) payload
       | Length title payload func <- funcs
       ]
+    mins funcs =
+      [ bench (title ++ ":10000") $ nf (\x -> func x) payload
+      | Min title payload func <- funcs
+      ]
+    maxs funcs =
+      [ bench (title ++ ":10000") $ nf (\x -> func x) payload
+      | Max title payload func <- funcs
+      ]
+    sorts funcs =
+      [ bench (title ++ ":10000") $ nf (\x -> func x) payload
+      | Sort title payload func <- funcs
+      ]
+    removeElems funcs =
+      [ bench (title ++ ":" ++ show relem) $ nf (\x -> func (/= relem) x) payload
+      | relem <- [1, 100, 1000, 10000 :: Int]
+      , RemoveElement title payload func <- funcs
+      ]
+    removeByIndexes funcs =
+      [ bench (title ++ ":" ++ show relem) $ nf (\x -> func (\index _ -> index /= relem) x) payload
+      | relem <- [1, 100, 1000, 10000 :: Int]
+      , RemoveByIndex title payload func <- funcs
+      ]
+    
     sampleList :: IO [Int]
     sampleList = evaluate $ force [1 .. 10005]
     sampleVector :: IO (V.Vector Int)
