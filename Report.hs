@@ -32,30 +32,31 @@ reportFromCsv fp = do
            (map
               format
               (filter
-                 (not . null . filter (not . null))
+                 (not . null . filter (not . null . filter (not . null)))
                  (groupBy (on (==) (takeWhile (/= '/') . concat . take 1)) rows))))
 
 format :: [[String]] -> String
 format rows =
   ("## " ++ takeWhile (/= '/') (concat (concat (take 1 (drop 1 rows))))) ++
-  "\n\n" ++ unlines ["|Name|Mean|Min|Max|Stddev|", "|---|---|---|---|---|"] ++
+  "\n\n" ++
+  unlines [("|Name|" ++ intercalate "|" scales ++ "|"), "|" ++ concat (replicate (1 + length scales) "---|")] ++
   unlines
-    (map
-       (\x ->
-          case x of
-            (name:mean:min:max:stddev:_) ->
-              "|" ++
-              intercalate
-                " | "
-                [ dropWhile (== '/') (dropWhile (/= '/') name)
-                , float mean
-                , float min
-                , float max
-                , float stddev
-                ] ++
-              "|"
-            k -> error (show k))
-       (filter (not . null . filter (not . null)) rows))
+    (map (\name -> "|" ++ name ++ "|" ++ intercalate "|" (values name) ++ "|") (names))
+  where
+    values name =
+      map (\(_:mean:_) -> float mean) (filter ((== name) . rowName) rows)
+    names = nub (map rowName rows)
+    scales = nub (map rowScale rows)
+    rowName row =
+      let s =
+            takeWhile
+              (/= ':')
+              (dropWhile (== '/') (dropWhile (/= '/') (concat (take 1 row))))
+      in s
+    rowScale row =
+      let scale = dropWhile (== ':') (dropWhile (/= ':') (concat (take 1 row)))
+      in scale
+
 
 float :: String -> String
 float x = secs (read x)
