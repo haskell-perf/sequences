@@ -67,10 +67,17 @@ main = do
            ])
     , bgroup
         "Min"
-        (lengths
-           [ Length "Data.List" list (L.minimum)
-           , Length "Data.Vector" vector (V.minimum)
-           , Length "Data.Vector.Unboxed" uvector (UV.minimum)
+        (mins
+           [ Min "Data.List" list (L.minimum)
+           , Min "Data.Vector" vector (V.minimum)
+           , Min "Data.Vector.Unboxed" uvector (UV.minimum)
+           ])
+    , bgroup
+        "Max"
+        (maxs
+           [ Max "Data.List" list (L.maximum)
+           , Max "Data.Vector" vector (V.maximum)
+           , Max "Data.Vector.Unboxed" uvector (UV.maximum)
            ])
     ]
   where
@@ -96,6 +103,10 @@ main = do
     mins funcs =
       [ bench (title ++ ":10000") $ nf (\x -> func x) payload
       | Min title payload func <- funcs
+      ]
+    maxs funcs =
+      [ bench (title ++ ":10000") $ nf (\x -> func x) payload
+      | Max title payload func <- funcs
       ]
     sampleList :: IO [Int]
     sampleList = evaluate $ force [1 .. 10005]
