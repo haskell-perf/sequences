@@ -20,7 +20,7 @@ data Indexing = forall f. NFData (f Int) => Indexing String (f Int) (f Int -> In
 data Length = forall f. NFData (f Int) => Length String (f Int) (f Int -> Int)
 data Min = forall f. NFData (f Int) => Min String (f Int) (f Int -> Int)
 data Max = forall f. NFData (f Int) => Max String (f Int) (f Int -> Int)
-data Sort = forall f. NFData (f Int) => Sort String (f Int) (f Int -> Int)
+data Sort = forall f. NFData (f Int) => Sort String (f Int) (f Int -> f Int)
 
 main :: IO ()
 main = do
@@ -79,6 +79,18 @@ main = do
            , Max "Data.Vector" vector (V.maximum)
            , Max "Data.Vector.Unboxed" uvector (UV.maximum)
            ])
+    , bgroup
+        "Sort"
+        (sorts
+           [ Sort "Data.List" list (L.sort)
+           , Sort "Data.Sequence" seqd (S.sort)
+           ])
+    , bgroup
+        "Remove Element"
+        (sorts
+           [ Sort "Data.List" list (L.sort)
+           , Sort "Data.Sequence" seqd (S.sort)
+           ])
     ]
   where
     conses funcs =
@@ -107,6 +119,10 @@ main = do
     maxs funcs =
       [ bench (title ++ ":10000") $ nf (\x -> func x) payload
       | Max title payload func <- funcs
+      ]
+    sorts funcs =
+      [ bench (title ++ ":10000") $ nf (\x -> func x) payload
+      | Sort title payload func <- funcs
       ]
     sampleList :: IO [Int]
     sampleList = evaluate $ force [1 .. 10005]
