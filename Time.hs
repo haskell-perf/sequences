@@ -21,6 +21,7 @@ data Length = forall f. NFData (f Int) => Length String (f Int) (f Int -> Int)
 data Min = forall f. NFData (f Int) => Min String (f Int) (f Int -> Int)
 data Max = forall f. NFData (f Int) => Max String (f Int) (f Int -> Int)
 data Sort = forall f. NFData (f Int) => Sort String (f Int) (f Int -> f Int)
+data RemoveElement = forall f. NFData (f Int) => RemoveElement String (f Int) ((Int -> Bool) -> f Int -> f Int)
 
 main :: IO ()
 main = do
@@ -87,9 +88,11 @@ main = do
            ])
     , bgroup
         "Remove Element"
-        (sorts
-           [ Sort "Data.List" list (L.sort)
-           , Sort "Data.Sequence" seqd (S.sort)
+        (removeElems
+           [ RemoveElement "Data.List" list (L.filter)
+           , RemoveElement "Data.Vector" vector (V.filter)
+           , RemoveElement "Data.Vector.Unboxed" uvector (UV.filter)
+           , RemoveElement "Data.Sequence" seqd (S.filter)
            ])
     ]
   where
@@ -123,6 +126,11 @@ main = do
     sorts funcs =
       [ bench (title ++ ":10000") $ nf (\x -> func x) payload
       | Sort title payload func <- funcs
+      ]
+    removeElems funcs =
+      [ bench (title ++ ":" ++ show relem) $ nf (\x -> func (/= relem) x) payload
+      | relem <- [1, 100, 1000, 10000 :: Int]
+      , RemoveElement title payload func <- funcs
       ]
     sampleList :: IO [Int]
     sampleList = evaluate $ force [1 .. 10005]
