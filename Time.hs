@@ -9,12 +9,14 @@ import           Control.Monad
 import           Criterion.Main
 import           Criterion.Types
 import qualified Data.List as L
+import           Data.Monoid
 import qualified Data.Sequence as S
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as UV
 import           System.Directory
 
 data Conser = forall f. NFData (f Int) => Conser String (Int -> f Int)
+data Append = forall f. NFData (f Int) => Append String (Int -> IO (f Int)) (f Int -> f Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
 data Indexing = forall f. NFData (f Int) => Indexing String (IO (f Int)) (f Int -> Int -> Int)
 data Length = forall f. NFData (f Int) => Length String (IO (f Int)) (f Int -> Int)
@@ -57,6 +59,14 @@ main = do
               , Indexing "Data.Vector.Unboxed" (sampleUVVector size) (UV.!)
               , Indexing "Data.Sequence" (sampleSeq size) (S.index)
               ])
+    , bgroup
+        "Append"
+        (appends
+           [ Append "Data.List" sampleList (<>)
+           , Append "Data.Vector" sampleVector (<>)
+           , Append "Data.Vector.Unboxed" sampleUVVector (<>)
+           , Append "Data.Sequence" sampleSeq (<>)
+           ])
     , bgroup
         "Length"
         (let size = 10005

@@ -19,6 +19,15 @@ For specific benchmarks:
 
 <!-- RESULTS -->
 
+## Append
+
+|Name|10|100|1000|10000|
+|---|---|---|---|---|
+|Data.List|171.9 ns|1.357 μs|13.82 μs|133.6 μs|
+|Data.Vector|575.5 ns|1.011 μs|5.808 μs|64.35 μs|
+|Data.Vector.Unboxed|53.94 ns|0.110 μs|0.791 μs|8.901 μs|
+|Data.Sequence|238.6 ns|1.774 μs|15.77 μs|151.2 μs|
+
 ## Consing
 
 |Name|10|100|1000|10000|
