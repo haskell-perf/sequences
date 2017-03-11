@@ -18,6 +18,9 @@ data Conser = forall f. NFData (f Int) => Conser String (Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
 data Indexing = forall f. NFData (f Int) => Indexing String (f Int) (f Int -> Int -> Int)
 data Length = forall f. NFData (f Int) => Length String (f Int) (f Int -> Int)
+data Min = forall f. NFData (f Int) => Min String (f Int) (f Int -> Int)
+data Max = forall f. NFData (f Int) => Max String (f Int) (f Int -> Int)
+data Sort = forall f. NFData (f Int) => Sort String (f Int) (f Int -> Int)
 
 main :: IO ()
 main = do
@@ -62,6 +65,13 @@ main = do
            , Length "Data.Vector.Unboxed" uvector (UV.length)
            , Length "Data.Sequence" seqd (S.length)
            ])
+    , bgroup
+        "Min"
+        (lengths
+           [ Length "Data.List" list (L.minimum)
+           , Length "Data.Vector" vector (V.minimum)
+           , Length "Data.Vector.Unboxed" uvector (UV.minimum)
+           ])
     ]
   where
     conses funcs =
@@ -82,6 +92,10 @@ main = do
     lengths funcs =
       [ bench (title ++ ":10000") $ nf (\x -> func x) payload
       | Length title payload func <- funcs
+      ]
+    mins funcs =
+      [ bench (title ++ ":10000") $ nf (\x -> func x) payload
+      | Min title payload func <- funcs
       ]
     sampleList :: IO [Int]
     sampleList = evaluate $ force [1 .. 10005]
