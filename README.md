@@ -55,3 +55,41 @@ For specific benchmarks:
 |Data.Vector.Unboxed|0.011 μs|
 |Data.Sequence|0.011 μs|
 
+## Min
+
+|Name|10000|
+|---|---|
+|Data.List|154.0 μs|
+|Data.Vector|22.92 μs|
+|Data.Vector.Unboxed|6.631 μs|
+
+## Max
+
+|Name|10000|
+|---|---|
+|Data.List|145.1 μs|
+|Data.Vector|23.85 μs|
+|Data.Vector.Unboxed|6.522 μs|
+
+## Sort
+
+|Name|10000|
+|---|---|
+|Data.List|0.296 ms|
+|Data.Sequence|3.959 ms|
+
+## Remove Element
+
+|Name|1|100|1000|10000|
+|---|---|---|---|---|
+|Data.List|156.4 μs|176.0 μs|171.0 μs|171.4 μs|
+|Data.Vector|744.4 μs|737.9 μs|745.0 μs|743.8 μs|
+|Data.Vector.Unboxed|64.00 μs|77.40 μs|76.44 μs|77.84 μs|
+|Data.Sequence|2240 μs|2246 μs|2229 μs|2252 μs|
+
+## Remove By Index
+
+|Name|1|100|1000|10000|
+|---|---|---|---|---|
+|Data.Vector|737.1 μs|744.0 μs|734.6 μs|743.2 μs|
+|Data.Vector.Unboxed|68.41 μs|82.31 μs|81.93 μs|82.13 μs|
