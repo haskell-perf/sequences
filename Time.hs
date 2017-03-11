@@ -50,56 +50,76 @@ main = do
            ])
     , bgroup
         "Indexing"
-        (indexes
-           [ Indexing "Data.List" sampleList (L.!!)
-           , Indexing "Data.Vector" sampleVector (V.!)
-           , Indexing "Data.Vector.Unboxed" sampleUVVector (UV.!)
-           , Indexing "Data.Sequence" sampleSeq (S.index)
-           ])
+        (let size = 10005
+         in indexes
+              [ Indexing "Data.List" (sampleList size) (L.!!)
+              , Indexing "Data.Vector" (sampleVector size) (V.!)
+              , Indexing "Data.Vector.Unboxed" (sampleUVVector size) (UV.!)
+              , Indexing "Data.Sequence" (sampleSeq size) (S.index)
+              ])
     , bgroup
         "Length"
-        (lengths
-           [ Length "Data.List" sampleList (L.length)
-           , Length "Data.Vector" sampleVector (V.length)
-           , Length "Data.Vector.Unboxed" sampleUVVector (UV.length)
-           , Length "Data.Sequence" sampleSeq (S.length)
-           ])
+        (let size = 10005
+         in lengths
+              [ Length "Data.List" (sampleList size) (L.length)
+              , Length "Data.Vector" (sampleVector size) (V.length)
+              , Length "Data.Vector.Unboxed" (sampleUVVector size) (UV.length)
+              , Length "Data.Sequence" (sampleSeq size) (S.length)
+              ])
     , bgroup
         "Min"
-        (mins
-           [ Min "Data.List" sampleList (L.minimum)
-           , Min "Data.Vector" sampleVector (V.minimum)
-           , Min "Data.Vector.Unboxed" sampleUVVector (UV.minimum)
-           ])
+        (let size = 10005
+         in mins
+              [ Min "Data.List" (sampleList size) (L.minimum)
+              , Min "Data.Vector" (sampleVector size) (V.minimum)
+              , Min "Data.Vector.Unboxed" (sampleUVVector size) (UV.minimum)
+              ])
     , bgroup
         "Max"
-        (maxs
-           [ Max "Data.List" sampleList (L.maximum)
-           , Max "Data.Vector" sampleVector (V.maximum)
-           , Max "Data.Vector.Unboxed" sampleUVVector (UV.maximum)
-           ])
+        (let size = 10005
+         in maxs
+              [ Max "Data.List" (sampleList size) (L.maximum)
+              , Max "Data.Vector" (sampleVector size) (V.maximum)
+              , Max "Data.Vector.Unboxed" (sampleUVVector size) (UV.maximum)
+              ])
     , bgroup
         "Sort"
-        (sorts
-           [ Sort "Data.List" sampleList (L.sort)
-           , Sort "Data.Sequence" sampleSeq (S.sort)
-           ])
+        (let size = 10005
+         in sorts
+              [ Sort "Data.List" (sampleList size) (L.sort)
+              , Sort "Data.Sequence" (sampleSeq size) (S.sort)
+              ])
     , bgroup
         "Remove Element"
-        (removeElems
-           [ RemoveElement "Data.List" sampleList (L.filter)
-           , RemoveElement "Data.Vector" sampleVector (V.filter)
-           , RemoveElement "Data.Vector.Unboxed" sampleUVVector (UV.filter)
-           , RemoveElement "Data.Sequence" sampleSeq (S.filter)
-           ])
+        (let size = 10005
+         in removeElems
+              [ RemoveElement "Data.List" (sampleList size) (L.filter)
+              , RemoveElement "Data.Vector" (sampleVector size) (V.filter)
+              , RemoveElement
+                  "Data.Vector.Unboxed"
+                  (sampleUVVector size)
+                  (UV.filter)
+              , RemoveElement "Data.Sequence" (sampleSeq size) (S.filter)
+              ])
     , bgroup
         "Remove By Index"
-        (removeByIndexes
-           [ RemoveByIndex "Data.Vector" sampleVector (V.ifilter)
-           , RemoveByIndex "Data.Vector.Unboxed" sampleUVVector (UV.ifilter)
-           ])
+        (let size = 10005
+         in removeByIndexes
+              [ RemoveByIndex "Data.Vector" (sampleVector size) (V.ifilter)
+              , RemoveByIndex
+                  "Data.Vector.Unboxed"
+                  (sampleUVVector size)
+                  (UV.ifilter)
+              ])
     ]
   where
+    appends funcs =
+      [ env
+        (payload i)
+        (\p -> bench (title ++ ":" ++ show i) $ nf (\x -> func x x) p)
+      | i <- [10, 100, 1000, 10000]
+      , Append title payload func <- funcs
+      ]
     conses funcs =
       [ bench (title ++ ":" ++ show i) $ nf func i
       | i <- [10, 100, 1000, 10000]
@@ -151,17 +171,17 @@ main = do
       , RemoveByIndex title payload func <- funcs
       ]
 
-sampleList :: IO [Int]
-sampleList = evaluate $ force [1 .. 10005]
+sampleList :: Int -> IO [Int]
+sampleList i = evaluate $ force [1 .. i]
 
-sampleVector :: IO (V.Vector Int)
-sampleVector = evaluate $ force $ V.generate 10005 id
+sampleVector :: Int -> IO (V.Vector Int)
+sampleVector i = evaluate $ force $ V.generate i id
 
-sampleUVVector :: IO (UV.Vector Int)
-sampleUVVector = evaluate $ force $ UV.generate 10005 id
+sampleUVVector :: Int -> IO (UV.Vector Int)
+sampleUVVector i = evaluate $ force $ UV.generate i id
 
-sampleSeq :: IO (S.Seq Int)
-sampleSeq = evaluate $ force $ S.fromList [1 .. 10005]
+sampleSeq :: Int -> IO (S.Seq Int)
+sampleSeq i = evaluate $ force $ S.fromList [1 .. i]
 
 conslist :: Int -> [Int]
 conslist n0 = go n0 []
