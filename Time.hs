@@ -23,6 +23,7 @@ import           Text.CSV
 data Conser = forall f. NFData (f Int) => Conser String (Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
 data Indexing = forall f. NFData (f Int) => Indexing String (f Int) (f Int -> Int -> Int)
+data Length = forall f. NFData (f Int) => Length String (f Int) (f Int -> Int)
 
 main :: IO ()
 main = do
@@ -59,6 +60,14 @@ main = do
            , Indexing "Data.Vector.Unboxed" uvector (UV.!)
            , Indexing "Data.Sequence" seqd (S.index)
            ])
+    , bgroup
+        "Length (Size: 10000)"
+        (lengths
+           [ Length "Data.List" list (L.length)
+           , Length "Data.Vector" vector (V.length)
+           , Length "Data.Vector.Unboxed" uvector (UV.length)
+           , Length "Data.Sequence" seqd (S.length)
+           ])
     ]
   reportFromCsv fp
   where
@@ -72,6 +81,15 @@ main = do
       | i <- [10, 1000, 10000]
       , Replicator title func <- funcs
       ]
+    indexes funcs =
+      [ bench (title ++ " " ++ show index) $ nf (\x -> func payload x) index
+      | index <- [100, 1000, 8000]
+      , Indexing title payload func <- funcs
+      ]
+    lengths funcs =
+      [ bench title $ nf (\x -> func x) payload
+      | Length title payload func <- funcs
+      ]
     sampleList :: IO [Int]
     sampleList = evaluate $ force [1 .. 10000]
     sampleVector :: IO (V.Vector Int)
@@ -80,11 +98,6 @@ main = do
     sampleUVVector = evaluate $ force $ UV.generate 10000 id
     sampleSeq :: IO (S.Seq Int)
     sampleSeq = evaluate $ force $ S.fromList [1 .. 10000]
-    indexes funcs =
-      [ bench (title ++ " " ++ show index) $ nf (\x -> func payload x) index
-      | index <- [100, 1000, 8000]
-      , Indexing title payload func <- funcs
-      ]
 
 conslist :: Int -> [Int]
 conslist n0 = go n0 []
