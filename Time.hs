@@ -37,7 +37,7 @@ main = do
   when exists (removeFile fp)
   defaultMainWith
     defaultConfig
-    {csvFile = Just fp, regressions = [(["regress"], "allocated:iters")]}
+    {csvFile = Just fp}
     [ bgroup
         "Consing"
         (conses
@@ -46,15 +46,6 @@ main = do
            , Conser "Data.Vector.Unboxed" sampleUVVector UV.cons
            , Conser "Data.Vector.Storable" sampleSVVector SV.cons
            , Conser "Data.Sequence" sampleSeq (S.<|)
-           ])
-    , bgroup
-        "Replicate"
-        (replicators
-           [ Replicator "Data.List" L.replicate
-           , Replicator "Data.Vector" V.replicate
-           , Replicator "Data.Vector.Unboxed" UV.replicate
-           , Replicator "Data.Vector.Storable" SV.replicate
-           , Replicator "Data.Sequence" S.replicate
            ])
     , bgroup
         "Indexing"
@@ -78,39 +69,48 @@ main = do
     , bgroup
         "Length"
         (lengths
-              [ Length "Data.List" sampleList (L.length)
-              , Length "Data.Vector" sampleVector (V.length)
-              , Length "Data.Vector.Unboxed" sampleUVVector (UV.length)
-              , Length "Data.Vector.Storable" sampleSVVector (SV.length)
-              , Length "Data.Sequence" sampleSeq (S.length)
-              ])
+           [ Length "Data.List" sampleList (L.length)
+           , Length "Data.Vector" sampleVector (V.length)
+           , Length "Data.Vector.Unboxed" sampleUVVector (UV.length)
+           , Length "Data.Vector.Storable" sampleSVVector (SV.length)
+           , Length "Data.Sequence" sampleSeq (S.length)
+           ])
+    , bgroup
+        "Stable Sort"
+        (sorts
+           [ Sort "Data.List" sampleList (L.sort)
+           , Sort "Data.Vector" sampleVector sortVec
+           , Sort "Data.Vector.Unboxed" sampleUVVector sortUVec
+           , Sort "Data.Vector.Storable" sampleSVVector sortSVec
+           , Sort "Data.Sequence" sampleSeq (S.sort)
+           ])
+    , bgroup
+        "Replicate"
+        (replicators
+           [ Replicator "Data.List" L.replicate
+           , Replicator "Data.Vector" V.replicate
+           , Replicator "Data.Vector.Unboxed" UV.replicate
+           , Replicator "Data.Vector.Storable" SV.replicate
+           , Replicator "Data.Sequence" S.replicate
+           ])
     , bgroup
         "Min"
         (mins
-              [ Min "Data.List" (sampleList) (L.minimum)
-              , Min "Data.Vector" (sampleVector) (V.minimum)
-              , Min "Data.Vector.Unboxed" (sampleUVVector) (UV.minimum)
-              , Min "Data.Vector.Storable" (sampleSVVector) (SV.minimum)
-              ])
+           [ Min "Data.List" (sampleList) (L.minimum)
+           , Min "Data.Vector" (sampleVector) (V.minimum)
+           , Min "Data.Vector.Unboxed" (sampleUVVector) (UV.minimum)
+           , Min "Data.Vector.Storable" (sampleSVVector) (SV.minimum)
+           ])
     , bgroup
         "Max"
         (maxs
-              [ Max "Data.List" sampleList (L.maximum)
-              , Max "Data.Vector" sampleVector (V.maximum)
-              , Max "Data.Vector.Unboxed" sampleUVVector (UV.maximum)
-              , Max "Data.Vector.Storable" sampleSVVector (SV.maximum)
-              ])
+           [ Max "Data.List" sampleList (L.maximum)
+           , Max "Data.Vector" sampleVector (V.maximum)
+           , Max "Data.Vector.Unboxed" sampleUVVector (UV.maximum)
+           , Max "Data.Vector.Storable" sampleSVVector (SV.maximum)
+           ])
     , bgroup
-        "Sort"
-        (sorts
-         [ Sort "Data.List" sampleList (L.sort)
-         , Sort "Data.Vector" sampleVector sortVec
-         , Sort "Data.Vector.Unboxed" sampleUVVector sortUVec
-         , Sort "Data.Vector.Storable" sampleSVVector sortSVec
-         , Sort "Data.Sequence" sampleSeq (S.sort)
-         ])
-    , bgroup
-        "Remove Element"
+        "Filter Element"
         (let size = 10005
          in removeElems
               [ RemoveElement "Data.List" (sampleList size) (L.filter)
@@ -126,7 +126,7 @@ main = do
               , RemoveElement "Data.Sequence" (sampleSeq size) (S.filter)
               ])
     , bgroup
-        "Remove By Index"
+        "Filter By Index"
         (let size = 10005
          in removeByIndexes
               [ RemoveByIndex "Data.Vector" (sampleVector size) (V.ifilter)
@@ -149,7 +149,9 @@ main = do
       , Append title payload func <- funcs
       ]
     conses funcs =
-      [ env (sample i) (\p -> bench (title ++ ":" ++ show i) (whnf (\e -> func e p) 1))
+      [ env
+        (sample i)
+        (\p -> bench (title ++ ":" ++ show i) (whnf (\e -> func e p) 1))
       | i <- [10, 100, 1000, 10000]
       , Conser title sample func <- funcs
       ]
@@ -166,24 +168,32 @@ main = do
       , Indexing title payload func <- funcs
       ]
     lengths funcs =
-      [ env (payload len) (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+      [ env
+        (payload len)
+        (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
       | len <- [10, 100, 1000, 10000]
       , Length title payload func <- funcs
       ]
     mins funcs =
-      [ env (payload len) (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+      [ env
+        (payload len)
+        (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
       | len <- [10, 100, 1000, 10000]
       , Min title payload func <- funcs
       ]
     maxs funcs =
-      [ env (payload len) (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+      [ env
+        (payload len)
+        (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
       | len <- [10, 100, 1000, 10000]
       , Max title payload func <- funcs
       ]
     sorts funcs =
-      [  env (payload len) (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
-      |  len <- [10, 100, 1000, 10000]
-      ,  Sort title payload func <- funcs
+      [ env
+        (payload len)
+        (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+      | len <- [10, 100, 1000, 10000]
+      , Sort title payload func <- funcs
       ]
     removeElems funcs =
       [ env
