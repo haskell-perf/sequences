@@ -220,7 +220,7 @@ sortUVec vec =
 sortSVec :: SV.Vector Int -> SV.Vector Int
 sortSVec vec =
   runST
-    (do mv <- SV.unsafeThaw vec
+    (do mv <- SV.thaw vec
         V.sort mv
         SV.unsafeFreeze mv)
 
