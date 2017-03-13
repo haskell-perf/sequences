@@ -52,35 +52,35 @@ For specific benchmarks:
 
 ## Length
 
-|Name|10000|
-|---|---|
-|Data.List|17.27 μs|
-|Data.Vector|0.019 μs|
-|Data.Vector.Unboxed|0.011 μs|
-|Data.Sequence|0.011 μs|
+|Name|10|100|1000|10000|
+|---|---|---|---|---|
+|Data.List|27.72 ns|187.5 ns|1997 ns|21.70 μs|
+|Data.Vector|20.10 ns|19.64 ns|20.09 ns|0.020 μs|
+|Data.Vector.Unboxed|12.41 ns|11.62 ns|11.98 ns|0.012 μs|
+|Data.Sequence|11.39 ns|11.33 ns|11.19 ns|0.012 μs|
 
 ## Min
 
-|Name|10000|
-|---|---|
-|Data.List|154.0 μs|
-|Data.Vector|22.92 μs|
-|Data.Vector.Unboxed|6.631 μs|
+|Name|10|100|1000|10000|
+|---|---|---|---|---|
+|Data.List|175.1 ns|1587 ns|15.36 μs|157.7 μs|
+|Data.Vector|35.65 ns|209.0 ns|1.910 μs|19.72 μs|
+|Data.Vector.Unboxed|24.40 ns|108.5 ns|0.933 μs|8.940 μs|
 
 ## Max
 
-|Name|10000|
-|---|---|
-|Data.List|145.1 μs|
-|Data.Vector|23.85 μs|
-|Data.Vector.Unboxed|6.522 μs|
+|Name|10|100|1000|10000|
+|---|---|---|---|---|
+|Data.List|161.1 ns|1519 ns|14.84 μs|146.8 μs|
+|Data.Vector|42.10 ns|227.3 ns|2.042 μs|20.97 μs|
+|Data.Vector.Unboxed|28.47 ns|117.1 ns|0.913 μs|9.010 μs|
 
 ## Sort
 
-|Name|10000|
-|---|---|
-|Data.List|0.296 ms|
-|Data.Sequence|3.959 ms|
+|Name|10|100|1000|10000|
+|---|---|---|---|---|
+|Data.List|0.228 μs|1.508 μs|15.55 μs|0.280 ms|
+|Data.Sequence|2.182 μs|16.37 μs|170.8 μs|4.092 ms|
 
 ## Remove Element
 
