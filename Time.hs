@@ -19,10 +19,10 @@ data Conser = forall f. NFData (f Int) => Conser String (Int -> f Int)
 data Append = forall f. NFData (f Int) => Append String (Int -> IO (f Int)) (f Int -> f Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
 data Indexing = forall f. NFData (f Int) => Indexing String (IO (f Int)) (f Int -> Int -> Int)
-data Length = forall f. NFData (f Int) => Length String (IO (f Int)) (f Int -> Int)
-data Min = forall f. NFData (f Int) => Min String (IO (f Int)) (f Int -> Int)
-data Max = forall f. NFData (f Int) => Max String (IO (f Int)) (f Int -> Int)
-data Sort = forall f. NFData (f Int) => Sort String (IO (f Int)) (f Int -> f Int)
+data Length = forall f. NFData (f Int) => Length String (Int -> IO (f Int)) (f Int -> Int)
+data Min = forall f. NFData (f Int) => Min String (Int -> IO (f Int)) (f Int -> Int)
+data Max = forall f. NFData (f Int) => Max String (Int -> IO (f Int)) (f Int -> Int)
+data Sort = forall f. NFData (f Int) => Sort String (Int -> IO (f Int)) (f Int -> f Int)
 data RemoveElement = forall f. NFData (f Int) => RemoveElement String (IO (f Int)) ((Int -> Bool) -> f Int -> f Int)
 data RemoveByIndex = forall f. NFData (f Int) => RemoveByIndex String (IO (f Int)) ((Int -> Int -> Bool) -> f Int -> f Int)
 
@@ -69,36 +69,32 @@ main = do
            ])
     , bgroup
         "Length"
-        (let size = 10005
-         in lengths
-              [ Length "Data.List" (sampleList size) (L.length)
-              , Length "Data.Vector" (sampleVector size) (V.length)
-              , Length "Data.Vector.Unboxed" (sampleUVVector size) (UV.length)
-              , Length "Data.Sequence" (sampleSeq size) (S.length)
+        (lengths
+              [ Length "Data.List" sampleList (L.length)
+              , Length "Data.Vector" sampleVector (V.length)
+              , Length "Data.Vector.Unboxed" sampleUVVector (UV.length)
+              , Length "Data.Sequence" sampleSeq (S.length)
               ])
     , bgroup
         "Min"
-        (let size = 10005
-         in mins
-              [ Min "Data.List" (sampleList size) (L.minimum)
-              , Min "Data.Vector" (sampleVector size) (V.minimum)
-              , Min "Data.Vector.Unboxed" (sampleUVVector size) (UV.minimum)
+        (mins
+              [ Min "Data.List" (sampleList) (L.minimum)
+              , Min "Data.Vector" (sampleVector) (V.minimum)
+              , Min "Data.Vector.Unboxed" (sampleUVVector) (UV.minimum)
               ])
     , bgroup
         "Max"
-        (let size = 10005
-         in maxs
-              [ Max "Data.List" (sampleList size) (L.maximum)
-              , Max "Data.Vector" (sampleVector size) (V.maximum)
-              , Max "Data.Vector.Unboxed" (sampleUVVector size) (UV.maximum)
+        (maxs
+              [ Max "Data.List" sampleList (L.maximum)
+              , Max "Data.Vector" sampleVector (V.maximum)
+              , Max "Data.Vector.Unboxed" sampleUVVector (UV.maximum)
               ])
     , bgroup
         "Sort"
-        (let size = 10005
-         in sorts
-              [ Sort "Data.List" (sampleList size) (L.sort)
-              , Sort "Data.Sequence" (sampleSeq size) (S.sort)
-              ])
+        (sorts
+         [ Sort "Data.List" sampleList (L.sort)
+         , Sort "Data.Sequence" sampleSeq (S.sort)
+         ])
     , bgroup
         "Remove Element"
         (let size = 10005
@@ -148,20 +144,24 @@ main = do
       , Indexing title payload func <- funcs
       ]
     lengths funcs =
-      [ env payload (\p -> bench (title ++ ":10000") $ nf (\x -> func x) p)
-      | Length title payload func <- funcs
+      [ env (payload len) (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+      | len <- [10, 100, 1000, 10000]
+      , Length title payload func <- funcs
       ]
     mins funcs =
-      [ env payload (\p -> bench (title ++ ":10000") $ nf (\x -> func x) p)
-      | Min title payload func <- funcs
+      [ env (payload len) (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+      | len <- [10, 100, 1000, 10000]
+      , Min title payload func <- funcs
       ]
     maxs funcs =
-      [ env payload (\p -> bench (title ++ ":10000") $ nf (\x -> func x) p)
-      | Max title payload func <- funcs
+      [ env (payload len) (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+      | len <- [10, 100, 1000, 10000]
+      , Max title payload func <- funcs
       ]
     sorts funcs =
-      [ env payload (\p -> bench (title ++ ":10000") $ nf (\x -> func x) p)
-      | Sort title payload func <- funcs
+      [  env (payload len) (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+      |  len <- [10, 100, 1000, 10000]
+      ,  Sort title payload func <- funcs
       ]
     removeElems funcs =
       [ env
