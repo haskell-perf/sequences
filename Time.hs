@@ -189,16 +189,16 @@ main = do
 sortVec :: V.Vector Int -> V.Vector Int
 sortVec vec =
   runST
-    (do mv <- V.unsafeThaw vec
+    (do mv <- V.thaw vec
         V.sort mv
-        V.unsafeFreeze mv)
+        V.freeze mv)
 
 sortUVec :: UV.Vector Int -> UV.Vector Int
 sortUVec vec =
   runST
-    (do mv <- UV.unsafeThaw vec
+    (do mv <- UV.thaw vec
         V.sort mv
-        UV.unsafeFreeze mv)
+        UV.freeze mv)
 
 sampleList :: Int -> IO [Int]
 sampleList i = evaluate $ force (take i (randoms (mkStdGen 0) :: [Int]))
