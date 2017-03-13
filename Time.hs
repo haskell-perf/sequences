@@ -16,6 +16,7 @@ import qualified Data.Vector as V
 import qualified Data.Vector.Algorithms.Merge as V
 import qualified Data.Vector.Unboxed as UV
 import           System.Directory
+import           System.Random
 
 data Conser = forall f. NFData (f Int) => Conser String (Int -> f Int)
 data Append = forall f. NFData (f Int) => Append String (Int -> IO (f Int)) (f Int -> f Int -> f Int)
@@ -200,16 +201,16 @@ sortUVec vec =
         UV.unsafeFreeze mv)
 
 sampleList :: Int -> IO [Int]
-sampleList i = evaluate $ force [1 .. i]
+sampleList i = evaluate $ force (take i (randoms (mkStdGen 0) :: [Int]))
 
 sampleVector :: Int -> IO (V.Vector Int)
-sampleVector i = evaluate $ force $ V.generate i id
+sampleVector i = evaluate $ force $ V.fromList (take i (randoms (mkStdGen 0) :: [Int]))
 
 sampleUVVector :: Int -> IO (UV.Vector Int)
-sampleUVVector i = evaluate $ force $ UV.generate i id
+sampleUVVector i = evaluate $ force $ UV.fromList (take i (randoms (mkStdGen 0) :: [Int]))
 
 sampleSeq :: Int -> IO (S.Seq Int)
-sampleSeq i = evaluate $ force $ S.fromList [1 .. i]
+sampleSeq i = evaluate $ force $ S.fromList (take i (randoms (mkStdGen 0) :: [Int]))
 
 conslist :: Int -> [Int]
 conslist n0 = go n0 []
