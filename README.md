@@ -79,10 +79,10 @@ For specific benchmarks:
 
 |Name|10|100|1000|10000|
 |---|---|---|---|---|
-|Data.List|0.804 μs|14.58 μs|278.3 μs|9.197 ms|
-|Data.Vector|1.241 μs|11.66 μs|153.3 μs|3.122 ms|
-|Data.Vector.Unboxed|1.026 μs|8.181 μs|95.25 μs|1.333 ms|
-|Data.Sequence|2.709 μs|29.13 μs|507.5 μs|13.85 ms|
+|Data.List|0.834 μs|14.37 μs|292.4 μs|8.322 ms|
+|Data.Vector|1.084 μs|12.12 μs|159.1 μs|2.845 ms|
+|Data.Vector.Unboxed|0.966 μs|8.391 μs|94.66 μs|1.291 ms|
+|Data.Sequence|2.824 μs|32.45 μs|497.4 μs|14.11 ms|
 
 ## Remove Element
 

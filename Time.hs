@@ -191,14 +191,14 @@ sortVec vec =
   runST
     (do mv <- V.thaw vec
         V.sort mv
-        V.freeze mv)
+        V.unsafeFreeze mv)
 
 sortUVec :: UV.Vector Int -> UV.Vector Int
 sortUVec vec =
   runST
     (do mv <- UV.thaw vec
         V.sort mv
-        UV.freeze mv)
+        UV.unsafeFreeze mv)
 
 sampleList :: Int -> IO [Int]
 sampleList i = evaluate $ force (take i (randoms (mkStdGen 0) :: [Int]))
