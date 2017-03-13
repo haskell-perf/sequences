@@ -145,7 +145,7 @@ main = do
       [ env
         (payload i)
         (\p -> bench (title ++ ":" ++ show i) $ nf (\x -> func x x) p)
-      | i <- [10, 100, 1000, 10000, 100000, 1000000, 10000000]
+      | i <- [10, 100, 1000, 10000]
       , Append title payload func <- funcs
       ]
     conses funcs =
