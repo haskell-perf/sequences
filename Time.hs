@@ -15,6 +15,7 @@ import qualified Data.Sequence as S
 import qualified Data.Vector as V
 import qualified Data.Vector.Algorithms.Merge as V
 import qualified Data.Vector.Unboxed as UV
+import qualified Data.Vector.Storable as SV
 import           System.Directory
 import           System.Random
 
@@ -43,6 +44,7 @@ main = do
            [ Conser "Data.List" conslist
            , Conser "Data.Vector" consvector
            , Conser "Data.Vector.Unboxed" consuvector
+           , Conser "Data.Vector.Storable" conssvector
            , Conser "Data.Sequence" consseq
            ])
     , bgroup
@@ -51,6 +53,7 @@ main = do
            [ Replicator "Data.List" L.replicate
            , Replicator "Data.Vector" V.replicate
            , Replicator "Data.Vector.Unboxed" UV.replicate
+           , Replicator "Data.Vector.Storable" SV.replicate
            , Replicator "Data.Sequence" S.replicate
            ])
     , bgroup
@@ -60,6 +63,7 @@ main = do
               [ Indexing "Data.List" (sampleList size) (L.!!)
               , Indexing "Data.Vector" (sampleVector size) (V.!)
               , Indexing "Data.Vector.Unboxed" (sampleUVVector size) (UV.!)
+              , Indexing "Data.Vector.Storable" (sampleSVVector size) (SV.!)
               , Indexing "Data.Sequence" (sampleSeq size) (S.index)
               ])
     , bgroup
@@ -68,6 +72,7 @@ main = do
            [ Append "Data.List" sampleList (<>)
            , Append "Data.Vector" sampleVector (<>)
            , Append "Data.Vector.Unboxed" sampleUVVector (<>)
+           , Append "Data.Vector.Storable" sampleSVVector (<>)
            , Append "Data.Sequence" sampleSeq (<>)
            ])
     , bgroup
@@ -76,6 +81,7 @@ main = do
               [ Length "Data.List" sampleList (L.length)
               , Length "Data.Vector" sampleVector (V.length)
               , Length "Data.Vector.Unboxed" sampleUVVector (UV.length)
+              , Length "Data.Vector.Storable" sampleSVVector (SV.length)
               , Length "Data.Sequence" sampleSeq (S.length)
               ])
     , bgroup
@@ -84,6 +90,7 @@ main = do
               [ Min "Data.List" (sampleList) (L.minimum)
               , Min "Data.Vector" (sampleVector) (V.minimum)
               , Min "Data.Vector.Unboxed" (sampleUVVector) (UV.minimum)
+              , Min "Data.Vector.Storable" (sampleSVVector) (SV.minimum)
               ])
     , bgroup
         "Max"
@@ -91,6 +98,7 @@ main = do
               [ Max "Data.List" sampleList (L.maximum)
               , Max "Data.Vector" sampleVector (V.maximum)
               , Max "Data.Vector.Unboxed" sampleUVVector (UV.maximum)
+              , Max "Data.Vector.Storable" sampleSVVector (SV.maximum)
               ])
     , bgroup
         "Sort"
@@ -98,6 +106,7 @@ main = do
          [ Sort "Data.List" sampleList (L.sort)
          , Sort "Data.Vector" sampleVector sortVec
          , Sort "Data.Vector.Unboxed" sampleUVVector sortUVec
+         , Sort "Data.Vector.Storable" sampleSVVector sortSVec
          , Sort "Data.Sequence" sampleSeq (S.sort)
          ])
     , bgroup
@@ -110,6 +119,10 @@ main = do
                   "Data.Vector.Unboxed"
                   (sampleUVVector size)
                   (UV.filter)
+              , RemoveElement
+                  "Data.Vector.Storable"
+                  (sampleSVVector size)
+                  (SV.filter)
               , RemoveElement "Data.Sequence" (sampleSeq size) (S.filter)
               ])
     , bgroup
@@ -121,6 +134,10 @@ main = do
                   "Data.Vector.Unboxed"
                   (sampleUVVector size)
                   (UV.ifilter)
+              , RemoveByIndex
+                  "Data.Vector.Storable"
+                  (sampleSVVector size)
+                  (SV.ifilter)
               ])
     ]
   where
@@ -200,6 +217,13 @@ sortUVec vec =
         V.sort mv
         UV.unsafeFreeze mv)
 
+sortSVec :: SV.Vector Int -> SV.Vector Int
+sortSVec vec =
+  runST
+    (do mv <- SV.unsafeThaw vec
+        V.sort mv
+        SV.unsafeFreeze mv)
+
 sampleList :: Int -> IO [Int]
 sampleList i = evaluate $ force (take i (randoms (mkStdGen 0) :: [Int]))
 
@@ -208,6 +232,9 @@ sampleVector i = evaluate $ force $ V.fromList (take i (randoms (mkStdGen 0) :: 
 
 sampleUVVector :: Int -> IO (UV.Vector Int)
 sampleUVVector i = evaluate $ force $ UV.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+
+sampleSVVector :: Int -> IO (SV.Vector Int)
+sampleSVVector i = evaluate $ force $ SV.fromList (take i (randoms (mkStdGen 0) :: [Int]))
 
 sampleSeq :: Int -> IO (S.Seq Int)
 sampleSeq i = evaluate $ force $ S.fromList (take i (randoms (mkStdGen 0) :: [Int]))
@@ -226,6 +253,11 @@ consuvector :: Int -> UV.Vector Int
 consuvector n0 = go n0 UV.empty
   where go 0 acc = acc
         go n !acc = go (n - 1) (UV.cons n acc)
+
+conssvector :: Int -> SV.Vector Int
+conssvector n0 = go n0 SV.empty
+  where go 0 acc = acc
+        go n !acc = go (n - 1) (SV.cons n acc)
 
 consseq :: Int -> S.Seq Int
 consseq n0 = go n0 S.empty
