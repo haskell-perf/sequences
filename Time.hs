@@ -6,12 +6,14 @@ module Main (main) where
 import           Control.DeepSeq
 import           Control.Exception (evaluate)
 import           Control.Monad
+import           Control.Monad.ST
 import           Criterion.Main
 import           Criterion.Types
 import qualified Data.List as L
 import           Data.Monoid
 import qualified Data.Sequence as S
 import qualified Data.Vector as V
+import qualified Data.Vector.Algorithms.Merge as V
 import qualified Data.Vector.Unboxed as UV
 import           System.Directory
 
@@ -93,6 +95,8 @@ main = do
         "Sort"
         (sorts
          [ Sort "Data.List" sampleList (L.sort)
+         , Sort "Data.Vector" sampleVector sortVec
+         , Sort "Data.Vector.Unboxed" sampleUVVector sortUVec
          , Sort "Data.Sequence" sampleSeq (S.sort)
          ])
     , bgroup
@@ -180,6 +184,20 @@ main = do
       | relem <- [1, 100, 1000, 10000 :: Int]
       , RemoveByIndex title payload func <- funcs
       ]
+
+sortVec :: V.Vector Int -> V.Vector Int
+sortVec vec =
+  runST
+    (do mv <- V.unsafeThaw vec
+        V.sort mv
+        V.unsafeFreeze mv)
+
+sortUVec :: UV.Vector Int -> UV.Vector Int
+sortUVec vec =
+  runST
+    (do mv <- UV.unsafeThaw vec
+        V.sort mv
+        UV.unsafeFreeze mv)
 
 sampleList :: Int -> IO [Int]
 sampleList i = evaluate $ force [1 .. i]
