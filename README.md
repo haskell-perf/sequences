@@ -18,95 +18,95 @@ For specific benchmarks:
 
 |Name|10|100|1000|10000|
 |---|---|---|---|---|
-|Data.List|9.799 ns|9.962 ns|10.03 ns|0.010 μs|
-|Data.Vector|497.4 ns|505.0 ns|1384 ns|10.70 μs|
-|Data.Vector.Unboxed|41.57 ns|64.19 ns|427.0 ns|4.692 μs|
-|Data.Vector.Storable|31.62 ns|67.64 ns|425.7 ns|4.740 μs|
-|Data.Sequence|15.88 ns|16.14 ns|16.17 ns|0.016 μs|
+|Data.List|10.79 ns|10.86 ns|11.19 ns|0.011 μs|
+|Data.Vector|422.6 ns|521.1 ns|1337 ns|10.85 μs|
+|Data.Vector.Unboxed|38.44 ns|62.71 ns|431.1 ns|4.789 μs|
+|Data.Vector.Storable|28.91 ns|65.31 ns|431.4 ns|4.836 μs|
+|Data.Sequence|14.61 ns|15.35 ns|14.71 ns|0.015 μs|
 
 ## Indexing
 
 |Name|10|100|1000|10000|
 |---|---|---|---|---|
-|Data.List|35.72 ns|198.0 ns|1821 ns|20.26 μs|
-|Data.Vector|37.92 ns|37.77 ns|38.55 ns|0.038 μs|
-|Data.Vector.Unboxed|20.07 ns|19.70 ns|19.78 ns|0.020 μs|
-|Data.Vector.Storable|15.54 ns|15.18 ns|15.10 ns|0.015 μs|
-|Data.Sequence|41.75 ns|86.69 ns|143.3 ns|0.049 μs|
+|Data.List|34.90 ns|201.9 ns|2008 ns|21.72 μs|
+|Data.Vector|35.96 ns|37.65 ns|38.55 ns|0.037 μs|
+|Data.Vector.Unboxed|20.75 ns|20.91 ns|21.39 ns|0.021 μs|
+|Data.Vector.Storable|16.41 ns|16.49 ns|16.90 ns|0.017 μs|
+|Data.Sequence|38.10 ns|72.18 ns|124.4 ns|0.038 μs|
 
 ## Append
 
 |Name|10|100|1000|10000|
 |---|---|---|---|---|
-|Data.List|193.0 ns|1727 ns|17.04 μs|170.6 μs|
-|Data.Vector|557.9 ns|999.2 ns|5.805 μs|64.55 μs|
-|Data.Vector.Unboxed|56.35 ns|114.2 ns|0.806 μs|8.912 μs|
-|Data.Vector.Storable|46.11 ns|119.9 ns|0.807 μs|9.065 μs|
-|Data.Sequence|248.4 ns|1901 ns|16.67 μs|160.6 μs|
+|Data.List|199.1 ns|1514 ns|15.91 μs|256.7 μs|
+|Data.Vector|500.7 ns|649.2 ns|2.204 μs|21.45 μs|
+|Data.Vector.Unboxed|55.60 ns|113.3 ns|0.827 μs|9.474 μs|
+|Data.Vector.Storable|43.61 ns|120.2 ns|0.824 μs|9.320 μs|
+|Data.Sequence|79.84 ns|175.5 ns|0.301 μs|0.396 μs|
 
 ## Length
 
 |Name|10|100|1000|10000|
 |---|---|---|---|---|
-|Data.List|26.24 ns|175.3 ns|1708 ns|21.28 μs|
-|Data.Vector|19.71 ns|19.94 ns|19.93 ns|0.020 μs|
-|Data.Vector.Unboxed|11.59 ns|11.85 ns|11.84 ns|0.012 μs|
-|Data.Vector.Storable|10.53 ns|10.83 ns|10.80 ns|0.011 μs|
-|Data.Sequence|11.02 ns|11.32 ns|11.27 ns|0.011 μs|
+|Data.List|28.38 ns|192.0 ns|1986 ns|23.03 μs|
+|Data.Vector|19.19 ns|20.19 ns|19.68 ns|0.020 μs|
+|Data.Vector.Unboxed|12.62 ns|12.98 ns|12.96 ns|0.013 μs|
+|Data.Vector.Storable|11.44 ns|11.86 ns|12.06 ns|0.012 μs|
+|Data.Sequence|10.50 ns|11.00 ns|10.73 ns|0.011 μs|
 
 ## Stable Sort
 
 |Name|10|100|1000|10000|
 |---|---|---|---|---|
-|Data.List|0.789 μs|14.62 μs|276.8 μs|9.438 ms|
-|Data.Vector|1.063 μs|11.20 μs|150.9 μs|2.690 ms|
-|Data.Vector.Unboxed|0.916 μs|7.683 μs|89.95 μs|1.194 ms|
-|Data.Vector.Storable|0.890 μs|7.479 μs|86.09 μs|1.081 ms|
-|Data.Sequence|2.734 μs|28.69 μs|498.4 μs|13.73 ms|
+|Data.List|0.810 μs|15.35 μs|293.4 μs|9.692 ms|
+|Data.Vector|1.072 μs|11.28 μs|151.1 μs|2.686 ms|
+|Data.Vector.Unboxed|0.951 μs|8.194 μs|88.66 μs|1.260 ms|
+|Data.Vector.Storable|0.924 μs|7.375 μs|80.36 μs|1.117 ms|
+|Data.Sequence|2.815 μs|29.98 μs|504.7 μs|13.53 ms|
 
 ## Replicate
 
 |Name|10|100|1000|10000|
 |---|---|---|---|---|
-|Data.List|124.5 ns|1056 ns|10.43 μs|103.0 μs|
-|Data.Vector|1015 ns|1629 ns|4.257 μs|30.30 μs|
-|Data.Vector.Unboxed|44.80 ns|108.9 ns|0.772 μs|6.981 μs|
-|Data.Vector.Storable|35.39 ns|106.1 ns|0.768 μs|7.006 μs|
-|Data.Sequence|84.09 ns|899.0 ns|8.201 μs|80.58 μs|
+|Data.List|116.0 ns|1072 ns|9.957 μs|101.1 μs|
+|Data.Vector|1033 ns|1757 ns|4.659 μs|31.19 μs|
+|Data.Vector.Unboxed|46.37 ns|110.9 ns|0.799 μs|7.209 μs|
+|Data.Vector.Storable|32.03 ns|104.8 ns|0.805 μs|7.222 μs|
+|Data.Sequence|110.6 ns|1039 ns|10.42 μs|102.8 μs|
 
 ## Min
 
 |Name|10|100|1000|10000|
 |---|---|---|---|---|
-|Data.List|158.0 ns|1505 ns|14.91 μs|149.4 μs|
-|Data.Vector|35.70 ns|221.2 ns|1.907 μs|18.96 μs|
-|Data.Vector.Unboxed|24.94 ns|128.7 ns|0.911 μs|8.584 μs|
-|Data.Vector.Storable|23.96 ns|123.8 ns|0.914 μs|8.528 μs|
+|Data.List|46.53 ns|350.6 ns|3.390 μs|33.91 μs|
+|Data.Vector|38.80 ns|231.4 ns|2.030 μs|19.26 μs|
+|Data.Vector.Unboxed|27.17 ns|133.2 ns|0.933 μs|8.792 μs|
+|Data.Vector.Storable|28.20 ns|142.5 ns|0.980 μs|8.818 μs|
 
 ## Max
 
 |Name|10|100|1000|10000|
 |---|---|---|---|---|
-|Data.List|147.4 ns|1345 ns|13.23 μs|131.8 μs|
-|Data.Vector|30.90 ns|222.9 ns|1.887 μs|18.89 μs|
-|Data.Vector.Unboxed|21.18 ns|101.2 ns|0.871 μs|8.469 μs|
-|Data.Vector.Storable|17.70 ns|99.93 ns|0.873 μs|8.515 μs|
+|Data.List|35.84 ns|348.5 ns|3.331 μs|35.24 μs|
+|Data.Vector|34.03 ns|232.7 ns|1.940 μs|20.24 μs|
+|Data.Vector.Unboxed|23.07 ns|108.0 ns|0.886 μs|8.817 μs|
+|Data.Vector.Storable|19.59 ns|104.5 ns|0.929 μs|8.762 μs|
 
 ## Filter Element
 
 |Name|1|100|1000|10000|
 |---|---|---|---|---|
-|Data.List|161.2 μs|173.0 μs|172.8 μs|174.3 μs|
-|Data.Vector|745.2 μs|752.6 μs|758.0 μs|760.9 μs|
-|Data.Vector.Unboxed|66.89 μs|78.06 μs|78.09 μs|78.17 μs|
-|Data.Vector.Storable|115.5 μs|125.8 μs|126.7 μs|127.6 μs|
-|Data.Sequence|2436 μs|2433 μs|2440 μs|2453 μs|
+|Data.List|182.3 μs|174.3 μs|175.0 μs|182.4 μs|
+|Data.Vector|780.7 μs|758.4 μs|761.7 μs|758.0 μs|
+|Data.Vector.Unboxed|83.35 μs|82.07 μs|84.79 μs|87.49 μs|
+|Data.Vector.Storable|142.1 μs|142.0 μs|149.3 μs|149.2 μs|
+|Data.Sequence|727.8 μs|734.5 μs|711.8 μs|700.9 μs|
 
 ## Filter By Index
 
 |Name|1|100|1000|10000|
 |---|---|---|---|---|
-|Data.Vector|748.1 μs|766.6 μs|755.4 μs|770.6 μs|
-|Data.Vector.Unboxed|68.51 μs|86.80 μs|82.48 μs|86.51 μs|
-|Data.Vector.Storable|132.8 μs|147.9 μs|143.5 μs|149.6 μs|
+|Data.Vector|751.3 μs|758.5 μs|764.5 μs|734.0 μs|
+|Data.Vector.Unboxed|86.76 μs|87.42 μs|85.25 μs|85.56 μs|
+|Data.Vector.Storable|148.3 μs|156.5 μs|149.2 μs|142.6 μs|
 

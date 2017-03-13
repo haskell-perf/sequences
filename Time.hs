@@ -20,7 +20,7 @@ import           System.Directory
 import           System.Random
 
 data Conser = forall f. NFData (f Int) => Conser String (Int -> IO (f Int)) (Int -> f Int -> f Int)
-data Append = forall f. NFData (f Int) => Append String (Int -> IO (f Int)) (f Int -> f Int -> f Int)
+data Append = forall f. NFData (f Int) => Append String (Int -> IO (f Int)) (f Int -> f Int -> f Int) (f Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
 data Indexing = forall f. NFData (f Int) => Indexing String (IO (f Int)) (f Int -> Int -> Int)
 data Length = forall f. NFData (f Int) => Length String (Int -> IO (f Int)) (f Int -> Int)
@@ -36,8 +36,7 @@ main = do
   exists <- doesFileExist fp
   when exists (removeFile fp)
   defaultMainWith
-    defaultConfig
-    {csvFile = Just fp}
+    defaultConfig {csvFile = Just fp}
     [ bgroup
         "Consing"
         (conses
@@ -60,11 +59,11 @@ main = do
     , bgroup
         "Append"
         (appends
-           [ Append "Data.List" sampleList (<>)
-           , Append "Data.Vector" sampleVector (<>)
-           , Append "Data.Vector.Unboxed" sampleUVVector (<>)
-           , Append "Data.Vector.Storable" sampleSVVector (<>)
-           , Append "Data.Sequence" sampleSeq (<>)
+           [ Append "Data.List" sampleList (<>) force
+           , Append "Data.Vector" sampleVector (<>) id
+           , Append "Data.Vector.Unboxed" sampleUVVector (<>) id
+           , Append "Data.Vector.Storable" sampleSVVector (<>) id
+           , Append "Data.Sequence" sampleSeq (<>) id
            ])
     , bgroup
         "Length"
@@ -144,9 +143,9 @@ main = do
     appends funcs =
       [ env
         (payload i)
-        (\p -> bench (title ++ ":" ++ show i) $ nf (\x -> func x x) p)
+        (\p -> bench (title ++ ":" ++ show i) $ whnf (\x -> forcer (func x x)) p)
       | i <- [10, 100, 1000, 10000]
-      , Append title payload func <- funcs
+      , Append title payload func forcer <- funcs
       ]
     conses funcs =
       [ env
