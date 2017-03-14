@@ -96,17 +96,16 @@ For specific benchmarks:
 
 |Name|1|100|1000|10000|
 |---|---|---|---|---|
-|Data.List|183.1 μs|183.4 μs|185.2 μs|187.8 μs|
-|Data.Vector|787.1 μs|790.8 μs|799.3 μs|812.4 μs|
-|Data.Vector.Unboxed|85.76 μs|85.61 μs|87.06 μs|84.19 μs|
-|Data.Vector.Storable|148.2 μs|148.1 μs|148.5 μs|147.7 μs|
-|Data.Sequence|729.8 μs|750.7 μs|753.5 μs|754.6 μs|
+|Data.List|195.3 μs|188.7 μs|190.6 μs|190.9 μs|
+|Data.Vector|789.5 μs|767.8 μs|783.2 μs|848.9 μs|
+|Data.Vector.Unboxed|82.96 μs|83.68 μs|85.69 μs|86.55 μs|
+|Data.Vector.Storable|141.5 μs|140.9 μs|146.5 μs|142.6 μs|
+|Data.Sequence|720.2 μs|704.3 μs|718.2 μs|694.7 μs|
 
 ## Filter By Index
 
 |Name|1|100|1000|10000|
 |---|---|---|---|---|
-|Data.Vector|799.8 μs|773.1 μs|798.6 μs|770.4 μs|
-|Data.Vector.Unboxed|91.60 μs|93.09 μs|91.41 μs|89.76 μs|
-|Data.Vector.Storable|159.6 μs|162.0 μs|156.6 μs|150.1 μs|
-
+|Data.Vector|761.5 μs|829.6 μs|801.8 μs|804.0 μs|
+|Data.Vector.Unboxed|88.65 μs|91.84 μs|92.63 μs|88.27 μs|
+|Data.Vector.Storable|146.0 μs|152.1 μs|157.7 μs|149.3 μs|
