@@ -77,11 +77,11 @@ main = do
     , bgroup
         "Stable Sort"
         (sorts
-           [ Sort "Data.List" sampleList (L.sort)
-           , Sort "Data.Vector" sampleVector sortVec
-           , Sort "Data.Vector.Unboxed" sampleUVVector sortUVec
-           , Sort "Data.Vector.Storable" sampleSVVector sortSVec
-           , Sort "Data.Sequence" sampleSeq (S.sort)
+           [ Sort "Data.List" randomSampleList (L.sort)
+           , Sort "Data.Vector" randomSampleVector sortVec
+           , Sort "Data.Vector.Unboxed" randomSampleUVVector sortUVec
+           , Sort "Data.Vector.Storable" randomSampleSVVector sortSVec
+           , Sort "Data.Sequence" randomSampleSeq (S.sort)
            ])
     , bgroup
         "Replicate"
@@ -95,18 +95,18 @@ main = do
     , bgroup
         "Min"
         (mins
-           [ Min "Data.List" (sampleList) (L.minimum)
-           , Min "Data.Vector" (sampleVector) (V.minimum)
-           , Min "Data.Vector.Unboxed" (sampleUVVector) (UV.minimum)
-           , Min "Data.Vector.Storable" (sampleSVVector) (SV.minimum)
+           [ Min "Data.List" (randomSampleList) (L.minimum)
+           , Min "Data.Vector" (randomSampleVector) (V.minimum)
+           , Min "Data.Vector.Unboxed" (randomSampleUVVector) (UV.minimum)
+           , Min "Data.Vector.Storable" (randomSampleSVVector) (SV.minimum)
            ])
     , bgroup
         "Max"
         (maxs
-           [ Max "Data.List" sampleList (L.maximum)
-           , Max "Data.Vector" sampleVector (V.maximum)
-           , Max "Data.Vector.Unboxed" sampleUVVector (UV.maximum)
-           , Max "Data.Vector.Storable" sampleSVVector (SV.maximum)
+           [ Max "Data.List" randomSampleList (L.maximum)
+           , Max "Data.Vector" randomSampleVector (V.maximum)
+           , Max "Data.Vector.Unboxed" randomSampleUVVector (UV.maximum)
+           , Max "Data.Vector.Storable" randomSampleSVVector (SV.maximum)
            ])
     , bgroup
         "Filter Element"
@@ -233,17 +233,32 @@ sortSVec vec =
         V.sort mv
         SV.unsafeFreeze mv)
 
+randomSampleList :: Int -> IO [Int]
+randomSampleList i = evaluate $ force (take i (randoms (mkStdGen 0) :: [Int]))
+
+randomSampleVector :: Int -> IO (V.Vector Int)
+randomSampleVector i = evaluate $ force $ V.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+
+randomSampleUVVector :: Int -> IO (UV.Vector Int)
+randomSampleUVVector i = evaluate $ force $ UV.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+
+randomSampleSVVector :: Int -> IO (SV.Vector Int)
+randomSampleSVVector i = evaluate $ force $ SV.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+
+randomSampleSeq :: Int -> IO (S.Seq Int)
+randomSampleSeq i = evaluate $ force $ S.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+
 sampleList :: Int -> IO [Int]
-sampleList i = evaluate $ force (take i (randoms (mkStdGen 0) :: [Int]))
+sampleList i = evaluate $ force [1..i]
 
 sampleVector :: Int -> IO (V.Vector Int)
-sampleVector i = evaluate $ force $ V.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+sampleVector i = evaluate $ force $ V.fromList [1..i]
 
 sampleUVVector :: Int -> IO (UV.Vector Int)
-sampleUVVector i = evaluate $ force $ UV.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+sampleUVVector i = evaluate $ force $ UV.fromList [1..i]
 
 sampleSVVector :: Int -> IO (SV.Vector Int)
-sampleSVVector i = evaluate $ force $ SV.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+sampleSVVector i = evaluate $ force $ SV.fromList [1..i]
 
 sampleSeq :: Int -> IO (S.Seq Int)
-sampleSeq i = evaluate $ force $ S.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+sampleSeq i = evaluate $ force $ S.fromList [1..i]
