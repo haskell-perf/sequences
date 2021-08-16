@@ -1,0 +1,16 @@
+name: Haskell CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: haskell/actions/setup@v1
+        with:
+          enable-stack: true
+      - name: Build report
+        run: stack build :report
+      - name: Build time
+        run: cabal build :time --no-run-benchmarks
