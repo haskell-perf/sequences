@@ -21,6 +21,7 @@ benchmark time
                    , vector-algorithms
                    , random
                    , massiv
+                   , rrb-vector
 
 executable report
   default-language: Haskell2010
