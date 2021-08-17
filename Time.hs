@@ -1,5 +1,5 @@
-{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE ExistentialQuantification #-}
 
 module Main (main) where
 
@@ -10,7 +10,6 @@ import           Control.Monad.ST
 import           Criterion.Main
 import           Criterion.Types
 import qualified Data.List as L
-import           Data.Monoid
 import qualified Data.Sequence as S
 import qualified Data.Vector as V
 import qualified Data.Vector.Algorithms.Merge as V
@@ -55,8 +54,8 @@ main = do
               , Indexing "Data.Vector" (sampleVector size) (V.!)
               , Indexing "Data.Vector.Unboxed" (sampleUVVector size) (UV.!)
               , Indexing "Data.Vector.Storable" (sampleSVVector size) (SV.!)
-              , Indexing "Data.Sequence" (sampleSeq size) (S.index)
-              , Indexing "Data.Massiv.Array" (sampleMassivUArray size) (M.index')
+              , Indexing "Data.Sequence" (sampleSeq size) S.index
+              , Indexing "Data.Massiv.Array" (sampleMassivUArray size) M.index'
               ])
     , bgroup
         "Append"
@@ -70,21 +69,21 @@ main = do
     , bgroup
         "Length"
         (lengths
-           [ Length "Data.List" sampleList (L.length)
-           , Length "Data.Vector" sampleVector (V.length)
-           , Length "Data.Vector.Unboxed" sampleUVVector (UV.length)
-           , Length "Data.Vector.Storable" sampleSVVector (SV.length)
-           , Length "Data.Sequence" sampleSeq (S.length)
+           [ Length "Data.List" sampleList L.length
+           , Length "Data.Vector" sampleVector V.length
+           , Length "Data.Vector.Unboxed" sampleUVVector UV.length
+           , Length "Data.Vector.Storable" sampleSVVector SV.length
+           , Length "Data.Sequence" sampleSeq S.length
            , Length "Data.Massiv.Array" sampleMassivUArray M.elemsCount
            ])
     , bgroup
         "Stable Sort"
         (sorts
-           [ Sort "Data.List" randomSampleList (L.sort)
+           [ Sort "Data.List" randomSampleList L.sort
            , Sort "Data.Vector" randomSampleVector sortVec
            , Sort "Data.Vector.Unboxed" randomSampleUVVector sortUVec
            , Sort "Data.Vector.Storable" randomSampleSVVector sortSVec
-           , Sort "Data.Sequence" randomSampleSeq (S.sort)
+           , Sort "Data.Sequence" randomSampleSeq S.sort
            ])
     , bgroup
         "Replicate"
@@ -98,50 +97,50 @@ main = do
     , bgroup
         "Min"
         (mins
-           [ Min "Data.List" (randomSampleList) (L.minimum)
-           , Min "Data.Vector" (randomSampleVector) (V.minimum)
-           , Min "Data.Vector.Unboxed" (randomSampleUVVector) (UV.minimum)
-           , Min "Data.Vector.Storable" (randomSampleSVVector) (SV.minimum)
-           , Min "Data.Massiv.Array" randomSampleMassivUArray M.minimum
+           [ Min "Data.List" randomSampleList L.minimum
+           , Min "Data.Vector" randomSampleVector V.minimum
+           , Min "Data.Vector.Unboxed" randomSampleUVVector UV.minimum
+           , Min "Data.Vector.Storable" randomSampleSVVector SV.minimum
+           , Min "Data.Massiv.Array" randomSampleMassivUArray M.minimum'
            ])
     , bgroup
         "Max"
         (maxs
-           [ Max "Data.List" randomSampleList (L.maximum)
-           , Max "Data.Vector" randomSampleVector (V.maximum)
-           , Max "Data.Vector.Unboxed" randomSampleUVVector (UV.maximum)
-           , Max "Data.Vector.Storable" randomSampleSVVector (SV.maximum)
-           , Max "Data.Massiv.Array" randomSampleMassivUArray M.maximum           
+           [ Max "Data.List" randomSampleList L.maximum
+           , Max "Data.Vector" randomSampleVector V.maximum
+           , Max "Data.Vector.Unboxed" randomSampleUVVector UV.maximum
+           , Max "Data.Vector.Storable" randomSampleSVVector SV.maximum
+           , Max "Data.Massiv.Array" randomSampleMassivUArray M.maximum'
            ])
     , bgroup
         "Filter Element"
         (let size = 10005
          in removeElems
-              [ RemoveElement "Data.List" (sampleList size) (L.filter)
-              , RemoveElement "Data.Vector" (sampleVector size) (V.filter)
+              [ RemoveElement "Data.List" (sampleList size) L.filter
+              , RemoveElement "Data.Vector" (sampleVector size) V.filter
               , RemoveElement
                   "Data.Vector.Unboxed"
                   (sampleUVVector size)
-                  (UV.filter)
+                  UV.filter
               , RemoveElement
                   "Data.Vector.Storable"
                   (sampleSVVector size)
-                  (SV.filter)
-              , RemoveElement "Data.Sequence" (sampleSeq size) (S.filter)
+                  SV.filter
+              , RemoveElement "Data.Sequence" (sampleSeq size) S.filter
               ])
     , bgroup
         "Filter By Index"
         (let size = 10005
          in removeByIndexes
-              [ RemoveByIndex "Data.Vector" (sampleVector size) (V.ifilter)
+              [ RemoveByIndex "Data.Vector" (sampleVector size) V.ifilter
               , RemoveByIndex
                   "Data.Vector.Unboxed"
                   (sampleUVVector size)
-                  (UV.ifilter)
+                  UV.ifilter
               , RemoveByIndex
                   "Data.Vector.Storable"
                   (sampleSVVector size)
-                  (SV.ifilter)
+                  SV.ifilter
               ])
     ]
   where

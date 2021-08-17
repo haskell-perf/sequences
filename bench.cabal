@@ -1,7 +1,7 @@
 name:                bench
 version:             0
 build-type:          Simple
-cabal-version:       >=1.10
+cabal-version:       >= 1.10
 
 library
   build-depends: base
@@ -13,30 +13,19 @@ benchmark time
   ghc-options:       -Wall -O2 -rtsopts
   main-is:           Time.hs
   build-depends:     base
-                   , bytestring, directory
+                   , directory
                    , vector
-                   , ghc-prim
                    , criterion
                    , deepseq
                    , containers
-                   , csv
                    , vector-algorithms
                    , random
-                   , massiv >= 0.2.6.0
+                   , massiv
 
 executable report
   default-language: Haskell2010
   ghc-options:       -Wall -O2 -rtsopts
   main-is:           Report.hs
   build-depends:     base
-                   , bytestring, directory
-                   , vector
-                   , ghc-prim
-                   , criterion
                    , deepseq
-                   , containers
                    , csv
-                   -- DEBUG
-                   , massiv
-                   , random
-                   , vector-algorithms

@@ -1,4 +1,1 @@
-resolver: lts-8.5
-extra-deps:
-- containers-0.5.10.1
-- massiv-0.2.6.0
+resolver: lts-18.5

@@ -1,7 +1,7 @@
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
-{-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE BangPatterns #-}
 
 module Main (main) where
 
@@ -14,14 +14,14 @@ import Text.Printf
 
 main :: IO ()
 main = do
-  fp:_ <- getArgs
+  fp : _ <- getArgs
   reportFromCsv fp
 
 reportFromCsv :: FilePath -> IO ()
 reportFromCsv fp = do
   result <- parseCSVFromFile fp
   case result of
-    Right (_:rows) -> do
+    Right (_ : rows) -> do
       !readme <- fmap force (readFile "README.md")
       let sep = "<!-- RESULTS -->"
           before = unlines (takeWhile (/= sep) (lines readme) ++ [sep ++ "\n"])
@@ -32,7 +32,7 @@ reportFromCsv fp = do
            (map
               format
               (filter
-                 (not . null . filter (not . null . filter (not . null)))
+                 (not . all (all null))
                  (groupBy (on (==) (takeWhile (/= '/') . concat . take 1)) rows))))
     _ -> error "Couldn't parse csv"
 
@@ -41,23 +41,23 @@ format rows =
   ("## " ++ takeWhile (/= '/') (concat (concat (take 1 (drop 1 rows))))) ++
   "\n\n" ++
   unlines
-    [ ("|Name|" ++ intercalate "|" scales ++ "|")
+    [ "|Name|" ++ intercalate "|" scales ++ "|"
     , "|" ++ concat (replicate (1 + length scales) "---|")
     ] ++
   unlines
     (map
        (\name ->
           "|" ++ name ++ "|" ++ intercalate "|" (valuesByName name) ++ "|")
-       (names))
+       names)
   where
     valuesByName name =
       map
-        (\row@(_:mean:_) ->
+        (\row@(_ : mean : _) ->
            let scale = rowScale row
            in float (valuesByScale scale) (read mean))
         (filter ((== name) . rowName) rows)
     valuesByScale scale =
-      map (\(_:mean:_) -> read mean) (filter ((== scale) . rowScale) rows)
+      map (\(_ : mean : _) -> read mean) (filter ((== scale) . rowScale) rows)
     names = nub (map rowName rows)
     scales = nub (map rowScale rows)
     rowName row =
