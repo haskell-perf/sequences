@@ -16,6 +16,7 @@ import qualified Data.Vector.Algorithms.Merge as V
 import qualified Data.Vector.Unboxed as UV
 import qualified Data.Vector.Storable as SV
 import qualified Data.Massiv.Array as M
+import qualified Data.RRBVector as RRB
 import           System.Directory
 import           System.Random
 
@@ -45,6 +46,7 @@ main = do
            , Conser "Data.Vector.Unboxed" sampleUVVector UV.cons
            , Conser "Data.Vector.Storable" sampleSVVector SV.cons
            , Conser "Data.Sequence" sampleSeq (S.<|)
+           , Conser "Data.RRBVector" sampleRRB (RRB.<|)
            ])
     , bgroup
         "Indexing"
@@ -56,15 +58,17 @@ main = do
               , Indexing "Data.Vector.Storable" (sampleSVVector size) (SV.!)
               , Indexing "Data.Sequence" (sampleSeq size) S.index
               , Indexing "Data.Massiv.Array" (sampleMassivUArray size) M.index'
+              , Indexing "Data.RRBVector" (sampleRRB size) (RRB.!)
               ])
     , bgroup
         "Append"
         (appends
-           [ Append "Data.List" sampleList (<>) force
-           , Append "Data.Vector" sampleVector (<>) id
-           , Append "Data.Vector.Unboxed" sampleUVVector (<>) id
-           , Append "Data.Vector.Storable" sampleSVVector (<>) id
-           , Append "Data.Sequence" sampleSeq (<>) id
+           [ Append "Data.List" sampleList (++) force
+           , Append "Data.Vector" sampleVector (V.++) id
+           , Append "Data.Vector.Unboxed" sampleUVVector (UV.++) id
+           , Append "Data.Vector.Storable" sampleSVVector (SV.++) id
+           , Append "Data.Sequence" sampleSeq (S.><) id
+           , Append "Data.RRBVector" sampleRRB (RRB.><) id
            ])
     , bgroup
         "Length"
@@ -75,6 +79,7 @@ main = do
            , Length "Data.Vector.Storable" sampleSVVector SV.length
            , Length "Data.Sequence" sampleSeq S.length
            , Length "Data.Massiv.Array" sampleMassivUArray M.elemsCount
+           , Length "Data.RRBVector" sampleRRB length
            ])
     , bgroup
         "Stable Sort"
@@ -93,6 +98,7 @@ main = do
            , Replicator "Data.Vector.Unboxed" UV.replicate
            , Replicator "Data.Vector.Storable" SV.replicate
            , Replicator "Data.Sequence" S.replicate
+           , Replicator "Data.RRBVector" RRB.replicate
            ])
     , bgroup
         "Min"
@@ -101,7 +107,9 @@ main = do
            , Min "Data.Vector" randomSampleVector V.minimum
            , Min "Data.Vector.Unboxed" randomSampleUVVector UV.minimum
            , Min "Data.Vector.Storable" randomSampleSVVector SV.minimum
+           , Min "Data.Sequence" randomSampleSeq minimum
            , Min "Data.Massiv.Array" randomSampleMassivUArray M.minimum'
+           , Min "Data.RRBVector" randomSampleRRB minimum
            ])
     , bgroup
         "Max"
@@ -110,7 +118,9 @@ main = do
            , Max "Data.Vector" randomSampleVector V.maximum
            , Max "Data.Vector.Unboxed" randomSampleUVVector UV.maximum
            , Max "Data.Vector.Storable" randomSampleSVVector SV.maximum
+           , Max "Data.Sequence" randomSampleSeq maximum
            , Max "Data.Massiv.Array" randomSampleMassivUArray M.maximum'
+           , Max "Data.RRBVector" randomSampleRRB maximum
            ])
     , bgroup
         "Filter Element"
@@ -238,23 +248,26 @@ sortSVec vec =
         SV.unsafeFreeze mv)
 
 randomSampleList :: Int -> IO [Int]
-randomSampleList i = evaluate $ force (take i (randoms (mkStdGen 0) :: [Int]))
+randomSampleList i = evaluate $ force (take i (randoms (mkStdGen 0)))
 
 randomSampleVector :: Int -> IO (V.Vector Int)
-randomSampleVector i = evaluate $ force $ V.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+randomSampleVector i = evaluate $ force $ V.fromList (take i (randoms (mkStdGen 0)))
 
 randomSampleUVVector :: Int -> IO (UV.Vector Int)
-randomSampleUVVector i = evaluate $ force $ UV.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+randomSampleUVVector i = evaluate $ force $ UV.fromList (take i (randoms (mkStdGen 0)))
 
 randomSampleSVVector :: Int -> IO (SV.Vector Int)
-randomSampleSVVector i = evaluate $ force $ SV.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+randomSampleSVVector i = evaluate $ force $ SV.fromList (take i (randoms (mkStdGen 0)))
 
 randomSampleSeq :: Int -> IO (S.Seq Int)
-randomSampleSeq i = evaluate $ force $ S.fromList (take i (randoms (mkStdGen 0) :: [Int]))
+randomSampleSeq i = evaluate $ force $ S.fromList (take i (randoms (mkStdGen 0)))
 
 randomSampleMassivUArray :: Int -> IO (M.Array M.U Int Int)
 randomSampleMassivUArray i = evaluate $ force ma where
-  ma = M.fromList M.Seq (take i (randoms (mkStdGen 0) :: [Int]))
+  ma = M.fromList M.Seq (take i (randoms (mkStdGen 0)))
+
+randomSampleRRB :: Int -> IO (RRB.Vector Int)
+randomSampleRRB i = evaluate $ force $ RRB.fromList (take i (randoms (mkStdGen 0)))
 
 sampleList :: Int -> IO [Int]
 sampleList i = evaluate $ force [1..i]
@@ -275,3 +288,6 @@ sampleMassivUArray :: Int -> IO (M.Array M.U Int Int)
 sampleMassivUArray i = evaluate $ force ma where
   ma :: M.Array M.U Int Int
   ma =  M.fromList M.Seq [1..i]
+
+sampleRRB :: Int -> IO (RRB.Vector Int)
+sampleRRB i = evaluate $ force $ RRB.fromList [1..i]
