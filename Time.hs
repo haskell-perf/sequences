@@ -24,6 +24,7 @@ import           System.Directory
 import           System.Random
 
 data Conser = forall f. NFData (f Int) => Conser String (Int -> IO (f Int)) (Int -> f Int -> f Int)
+data Snocer = forall f. NFData (f Int) => Snocer String (Int -> IO (f Int)) (f Int -> Int -> f Int)
 data Append = forall f. NFData (f Int) => Append String (Int -> IO (f Int)) (f Int -> f Int -> f Int) (f Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
 data Indexing = forall f. NFData (f Int) => Indexing String (IO (f Int)) (f Int -> Int -> Int)
@@ -52,6 +53,17 @@ main = do
            , Conser "Data.Sequence" sampleSeq (S.<|)
            , Conser "Data.RRBVector" sampleRRB (RRB.<|)
            , Conser "Data.Acc" sampleAcc Acc.cons
+           ])
+    , bgroup
+        "Snocing"
+        (snocs
+           [ Snocer "Data.DList" sampleDList D.snoc
+           , Snocer "Data.Vector" sampleVector V.snoc
+           , Snocer "Data.Vector.Unboxed" sampleUVVector UV.snoc
+           , Snocer "Data.Vector.Storable" sampleSVVector SV.snoc
+           , Snocer "Data.Sequence" sampleSeq (S.|>)
+           , Snocer "Data.RRBVector" sampleRRB (RRB.|>)
+           , Snocer "Data.Acc" sampleAcc (flip Acc.snoc)
            ])
     , bgroup
         "Indexing"
@@ -181,6 +193,13 @@ main = do
         (\p -> bench (title ++ ":" ++ show i) (whnf (\e -> func e p) 1))
       | i <- [10, 100, 1000, 10000]
       , Conser title sample func <- funcs
+      ]
+    snocs funcs =
+      [ env
+        (sample i)
+        (\p -> bench (title ++ ":" ++ show i) (whnf (\e -> func p e) 1))
+      | i <- [10, 100, 1000, 10000]
+      , Snocer title sample func <- funcs
       ]
     replicators funcs =
       [ bench (title ++ ":" ++ show i) $ nf (\(x, y) -> func x y) (i, 1234)
