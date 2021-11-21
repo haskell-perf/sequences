@@ -10,6 +10,7 @@ import           Control.Monad.ST
 import           Criterion.Main
 import           Criterion.Types
 import qualified Data.List as L
+import qualified Data.DList as D
 import qualified Data.Sequence as S
 import qualified Data.Vector as V
 import qualified Data.Vector.Algorithms.Merge as V
@@ -42,6 +43,7 @@ main = do
         "Consing"
         (conses
            [ Conser "Data.List" sampleList (:)
+           , Conser "Data.DList" sampleDList D.cons
            , Conser "Data.Vector" sampleVector V.cons
            , Conser "Data.Vector.Unboxed" sampleUVVector UV.cons
            , Conser "Data.Vector.Storable" sampleSVVector SV.cons
@@ -64,6 +66,7 @@ main = do
         "Append"
         (appends
            [ Append "Data.List" sampleList (++) force
+           , Append "Data.DList" sampleDList D.append id
            , Append "Data.Vector" sampleVector (V.++) id
            , Append "Data.Vector.Unboxed" sampleUVVector (UV.++) id
            , Append "Data.Vector.Storable" sampleSVVector (SV.++) id
@@ -74,6 +77,7 @@ main = do
         "Length"
         (lengths
            [ Length "Data.List" sampleList L.length
+           , Length "Data.DList" sampleDList length
            , Length "Data.Vector" sampleVector V.length
            , Length "Data.Vector.Unboxed" sampleUVVector UV.length
            , Length "Data.Vector.Storable" sampleSVVector SV.length
@@ -94,6 +98,7 @@ main = do
         "Replicate"
         (replicators
            [ Replicator "Data.List" L.replicate
+           , Replicator "Data.DList" D.replicate
            , Replicator "Data.Vector" V.replicate
            , Replicator "Data.Vector.Unboxed" UV.replicate
            , Replicator "Data.Vector.Storable" SV.replicate
@@ -104,6 +109,7 @@ main = do
         "Min"
         (mins
            [ Min "Data.List" randomSampleList L.minimum
+           , Min "Data.DList" randomSampleDList minimum
            , Min "Data.Vector" randomSampleVector V.minimum
            , Min "Data.Vector.Unboxed" randomSampleUVVector UV.minimum
            , Min "Data.Vector.Storable" randomSampleSVVector SV.minimum
@@ -115,6 +121,7 @@ main = do
         "Max"
         (maxs
            [ Max "Data.List" randomSampleList L.maximum
+           , Max "Data.DList" randomSampleDList maximum
            , Max "Data.Vector" randomSampleVector V.maximum
            , Max "Data.Vector.Unboxed" randomSampleUVVector UV.maximum
            , Max "Data.Vector.Storable" randomSampleSVVector SV.maximum
@@ -250,6 +257,9 @@ sortSVec vec =
 randomSampleList :: Int -> IO [Int]
 randomSampleList i = evaluate $ force (take i (randoms (mkStdGen 0)))
 
+randomSampleDList :: Int -> IO (D.DList Int)
+randomSampleDList i = evaluate $ force $ D.fromList (take i (randoms (mkStdGen 0)))
+
 randomSampleVector :: Int -> IO (V.Vector Int)
 randomSampleVector i = evaluate $ force $ V.fromList (take i (randoms (mkStdGen 0)))
 
@@ -272,6 +282,8 @@ randomSampleRRB i = evaluate $ force $ RRB.fromList (take i (randoms (mkStdGen 0
 sampleList :: Int -> IO [Int]
 sampleList i = evaluate $ force [1..i]
 
+sampleDList :: Int -> IO (D.DList Int)
+sampleDList i = evaluate $ force $ D.fromList [1..i]
 sampleVector :: Int -> IO (V.Vector Int)
 sampleVector i = evaluate $ force $ V.fromList [1..i]
 
