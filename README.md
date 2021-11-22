@@ -12,6 +12,8 @@ For specific benchmarks:
 
     $ stack bench :time --benchmark-arguments Consing
 
+# Results
+
 Results are ordered by least to most time.
 
 <!-- RESULTS -->
