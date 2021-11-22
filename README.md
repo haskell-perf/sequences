@@ -12,6 +12,8 @@ For specific benchmarks:
 
     $ stack bench :time --benchmark-arguments Consing
 
+Results are ordered by least to most time.
+
 <!-- RESULTS -->
 
 ## Consing
@@ -145,4 +147,3 @@ For specific benchmarks:
 |Data.Vector.Unboxed|70.23 μs|119.1 μs|95.71 μs|72.42 μs|
 |Data.Vector.Storable|122.9 μs|166.2 μs|114.3 μs|130.1 μs|
 |Data.Vector|188.4 μs|179.2 μs|342.2 μs|222.0 μs|
-
