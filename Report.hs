@@ -5,6 +5,7 @@
 
 module Main (main) where
 
+import Data.Ord
 import Control.DeepSeq
 import Data.Function
 import Data.List
@@ -21,7 +22,7 @@ reportFromCsv :: FilePath -> IO ()
 reportFromCsv fp = do
   result <- parseCSVFromFile fp
   case result of
-    Right (_ : rows) -> do
+    Right (_:rows) -> do
       !readme <- fmap force (readFile "README.md")
       let sep = "<!-- RESULTS -->"
           before = unlines (takeWhile (/= sep) (lines readme) ++ [sep ++ "\n"])
@@ -33,7 +34,9 @@ reportFromCsv fp = do
               format
               (filter
                  (not . all (all null))
-                 (groupBy (on (==) (takeWhile (/= '/') . concat . take 1)) rows))))
+                 (groupBy
+                    (on (==) (takeWhile (/= '/') . concat . take 1))
+                    rows))))
     _ -> error "Couldn't parse csv"
 
 format :: [[String]] -> String
@@ -48,7 +51,7 @@ format rows =
     (map
        (\name ->
           "|" ++ name ++ "|" ++ intercalate "|" (valuesByName name) ++ "|")
-       names)
+       (sortBy (comparing totalsByName) names))
   where
     valuesByName name =
       map
@@ -56,6 +59,12 @@ format rows =
            let scale = rowScale row
            in float (valuesByScale scale) (read mean))
         (filter ((== name) . rowName) rows)
+    totalsByName :: String -> Double
+    totalsByName name =
+      sum (map
+         (\(_ : mean : _) ->
+            (read mean))
+         (filter ((== name) . rowName) rows))
     valuesByScale scale =
       map (\(_ : mean : _) -> read mean) (filter ((== scale) . rowScale) rows)
     names = nub (map rowName rows)
