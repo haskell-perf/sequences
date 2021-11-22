@@ -22,6 +22,8 @@ benchmark time
                    , random
                    , massiv
                    , rrb-vector
+                   , dlist
+                   , acc
 
 executable report
   default-language: Haskell2010

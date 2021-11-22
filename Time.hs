@@ -10,6 +10,7 @@ import           Control.Monad.ST
 import           Criterion.Main
 import           Criterion.Types
 import qualified Data.List as L
+import qualified Data.DList as D
 import qualified Data.Sequence as S
 import qualified Data.Vector as V
 import qualified Data.Vector.Algorithms.Merge as V
@@ -17,10 +18,13 @@ import qualified Data.Vector.Unboxed as UV
 import qualified Data.Vector.Storable as SV
 import qualified Data.Massiv.Array as M
 import qualified Data.RRBVector as RRB
+import qualified Acc
+import qualified GHC.Exts
 import           System.Directory
 import           System.Random
 
 data Conser = forall f. NFData (f Int) => Conser String (Int -> IO (f Int)) (Int -> f Int -> f Int)
+data Snocer = forall f. NFData (f Int) => Snocer String (Int -> IO (f Int)) (f Int -> Int -> f Int)
 data Append = forall f. NFData (f Int) => Append String (Int -> IO (f Int)) (f Int -> f Int -> f Int) (f Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
 data Indexing = forall f. NFData (f Int) => Indexing String (IO (f Int)) (f Int -> Int -> Int)
@@ -42,11 +46,24 @@ main = do
         "Consing"
         (conses
            [ Conser "Data.List" sampleList (:)
+           , Conser "Data.DList" sampleDList D.cons
            , Conser "Data.Vector" sampleVector V.cons
            , Conser "Data.Vector.Unboxed" sampleUVVector UV.cons
            , Conser "Data.Vector.Storable" sampleSVVector SV.cons
            , Conser "Data.Sequence" sampleSeq (S.<|)
            , Conser "Data.RRBVector" sampleRRB (RRB.<|)
+           , Conser "Data.Acc" sampleAcc Acc.cons
+           ])
+    , bgroup
+        "Snocing"
+        (snocs
+           [ Snocer "Data.DList" sampleDList D.snoc
+           , Snocer "Data.Vector" sampleVector V.snoc
+           , Snocer "Data.Vector.Unboxed" sampleUVVector UV.snoc
+           , Snocer "Data.Vector.Storable" sampleSVVector SV.snoc
+           , Snocer "Data.Sequence" sampleSeq (S.|>)
+           , Snocer "Data.RRBVector" sampleRRB (RRB.|>)
+           , Snocer "Data.Acc" sampleAcc (flip Acc.snoc)
            ])
     , bgroup
         "Indexing"
@@ -64,22 +81,26 @@ main = do
         "Append"
         (appends
            [ Append "Data.List" sampleList (++) force
+           , Append "Data.DList" sampleDList D.append id
            , Append "Data.Vector" sampleVector (V.++) id
            , Append "Data.Vector.Unboxed" sampleUVVector (UV.++) id
            , Append "Data.Vector.Storable" sampleSVVector (SV.++) id
            , Append "Data.Sequence" sampleSeq (S.><) id
            , Append "Data.RRBVector" sampleRRB (RRB.><) id
+           , Append "Data.Acc" sampleAcc (<>) id
            ])
     , bgroup
         "Length"
         (lengths
            [ Length "Data.List" sampleList L.length
+           , Length "Data.DList" sampleDList length
            , Length "Data.Vector" sampleVector V.length
            , Length "Data.Vector.Unboxed" sampleUVVector UV.length
            , Length "Data.Vector.Storable" sampleSVVector SV.length
            , Length "Data.Sequence" sampleSeq S.length
            , Length "Data.Massiv.Array" sampleMassivUArray M.elemsCount
            , Length "Data.RRBVector" sampleRRB length
+           , Length "Data.Acc" sampleAcc length
            ])
     , bgroup
         "Stable Sort"
@@ -94,6 +115,7 @@ main = do
         "Replicate"
         (replicators
            [ Replicator "Data.List" L.replicate
+           , Replicator "Data.DList" D.replicate
            , Replicator "Data.Vector" V.replicate
            , Replicator "Data.Vector.Unboxed" UV.replicate
            , Replicator "Data.Vector.Storable" SV.replicate
@@ -104,23 +126,27 @@ main = do
         "Min"
         (mins
            [ Min "Data.List" randomSampleList L.minimum
+           , Min "Data.DList" randomSampleDList minimum
            , Min "Data.Vector" randomSampleVector V.minimum
            , Min "Data.Vector.Unboxed" randomSampleUVVector UV.minimum
            , Min "Data.Vector.Storable" randomSampleSVVector SV.minimum
            , Min "Data.Sequence" randomSampleSeq minimum
            , Min "Data.Massiv.Array" randomSampleMassivUArray M.minimum'
            , Min "Data.RRBVector" randomSampleRRB minimum
+           , Min "Data.Acc" randomSampleAcc minimum
            ])
     , bgroup
         "Max"
         (maxs
            [ Max "Data.List" randomSampleList L.maximum
+           , Max "Data.DList" randomSampleDList maximum
            , Max "Data.Vector" randomSampleVector V.maximum
            , Max "Data.Vector.Unboxed" randomSampleUVVector UV.maximum
            , Max "Data.Vector.Storable" randomSampleSVVector SV.maximum
            , Max "Data.Sequence" randomSampleSeq maximum
            , Max "Data.Massiv.Array" randomSampleMassivUArray M.maximum'
            , Max "Data.RRBVector" randomSampleRRB maximum
+           , Max "Data.Acc" randomSampleAcc maximum
            ])
     , bgroup
         "Filter Element"
@@ -167,6 +193,13 @@ main = do
         (\p -> bench (title ++ ":" ++ show i) (whnf (\e -> func e p) 1))
       | i <- [10, 100, 1000, 10000]
       , Conser title sample func <- funcs
+      ]
+    snocs funcs =
+      [ env
+        (sample i)
+        (\p -> bench (title ++ ":" ++ show i) (whnf (\e -> func p e) 1))
+      | i <- [10, 100, 1000, 10000]
+      , Snocer title sample func <- funcs
       ]
     replicators funcs =
       [ bench (title ++ ":" ++ show i) $ nf (\(x, y) -> func x y) (i, 1234)
@@ -250,6 +283,9 @@ sortSVec vec =
 randomSampleList :: Int -> IO [Int]
 randomSampleList i = evaluate $ force (take i (randoms (mkStdGen 0)))
 
+randomSampleDList :: Int -> IO (D.DList Int)
+randomSampleDList i = evaluate $ force $ D.fromList (take i (randoms (mkStdGen 0)))
+
 randomSampleVector :: Int -> IO (V.Vector Int)
 randomSampleVector i = evaluate $ force $ V.fromList (take i (randoms (mkStdGen 0)))
 
@@ -269,9 +305,14 @@ randomSampleMassivUArray i = evaluate $ force ma where
 randomSampleRRB :: Int -> IO (RRB.Vector Int)
 randomSampleRRB i = evaluate $ force $ RRB.fromList (take i (randoms (mkStdGen 0)))
 
+randomSampleAcc :: Int -> IO (Acc.Acc Int)
+randomSampleAcc i = evaluate $ force $ GHC.Exts.fromList (take i (randoms (mkStdGen 0)))
+
 sampleList :: Int -> IO [Int]
 sampleList i = evaluate $ force [1..i]
 
+sampleDList :: Int -> IO (D.DList Int)
+sampleDList i = evaluate $ force $ D.fromList [1..i]
 sampleVector :: Int -> IO (V.Vector Int)
 sampleVector i = evaluate $ force $ V.fromList [1..i]
 
@@ -291,3 +332,6 @@ sampleMassivUArray i = evaluate $ force ma where
 
 sampleRRB :: Int -> IO (RRB.Vector Int)
 sampleRRB i = evaluate $ force $ RRB.fromList [1..i]
+
+sampleAcc :: Int -> IO (Acc.Acc Int)
+sampleAcc i = evaluate $ force $ GHC.Exts.fromList [1..i]
