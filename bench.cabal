@@ -15,7 +15,8 @@ benchmark time
   build-depends:     base
                    , directory
                    , vector
-                   , criterion
+                   , tasty
+                   , tasty-bench
                    , deepseq
                    , containers
                    , vector-algorithms
