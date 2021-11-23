@@ -18,8 +18,6 @@ import qualified Data.Vector.Unboxed as UV
 import qualified Data.Vector.Storable as SV
 import qualified Data.Massiv.Array as M
 import qualified Data.RRBVector as RRB
-import qualified Acc
-import qualified GHC.Exts
 import           System.Directory
 import           System.Random
 
@@ -52,7 +50,6 @@ main = do
            , Conser "Data.Vector.Storable" sampleSVVector SV.cons
            , Conser "Data.Sequence" sampleSeq (S.<|)
            , Conser "Data.RRBVector" sampleRRB (RRB.<|)
-           , Conser "Data.Acc" sampleAcc Acc.cons
            ])
     , bgroup
         "Snocing"
@@ -87,7 +84,6 @@ main = do
            , Append "Data.Vector.Storable" sampleSVVector (SV.++) id
            , Append "Data.Sequence" sampleSeq (S.><) id
            , Append "Data.RRBVector" sampleRRB (RRB.><) id
-           , Append "Data.Acc" sampleAcc (<>) id
            ])
     , bgroup
         "Length"
@@ -100,7 +96,6 @@ main = do
            , Length "Data.Sequence" sampleSeq S.length
            , Length "Data.Massiv.Array" sampleMassivUArray M.elemsCount
            , Length "Data.RRBVector" sampleRRB length
-           , Length "Data.Acc" sampleAcc length
            ])
     , bgroup
         "Stable Sort"
@@ -133,7 +128,6 @@ main = do
            , Min "Data.Sequence" randomSampleSeq minimum
            , Min "Data.Massiv.Array" randomSampleMassivUArray M.minimum'
            , Min "Data.RRBVector" randomSampleRRB minimum
-           , Min "Data.Acc" randomSampleAcc minimum
            ])
     , bgroup
         "Max"
@@ -146,7 +140,6 @@ main = do
            , Max "Data.Sequence" randomSampleSeq maximum
            , Max "Data.Massiv.Array" randomSampleMassivUArray M.maximum'
            , Max "Data.RRBVector" randomSampleRRB maximum
-           , Max "Data.Acc" randomSampleAcc maximum
            ])
     , bgroup
         "Filter Element"
@@ -305,9 +298,6 @@ randomSampleMassivUArray i = evaluate $ force ma where
 randomSampleRRB :: Int -> IO (RRB.Vector Int)
 randomSampleRRB i = evaluate $ force $ RRB.fromList (take i (randoms (mkStdGen 0)))
 
-randomSampleAcc :: Int -> IO (Acc.Acc Int)
-randomSampleAcc i = evaluate $ force $ GHC.Exts.fromList (take i (randoms (mkStdGen 0)))
-
 sampleList :: Int -> IO [Int]
 sampleList i = evaluate $ force [1..i]
 
@@ -332,6 +322,3 @@ sampleMassivUArray i = evaluate $ force ma where
 
 sampleRRB :: Int -> IO (RRB.Vector Int)
 sampleRRB i = evaluate $ force $ RRB.fromList [1..i]
-
-sampleAcc :: Int -> IO (Acc.Acc Int)
-sampleAcc i = evaluate $ force $ GHC.Exts.fromList [1..i]
