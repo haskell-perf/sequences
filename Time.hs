@@ -182,65 +182,67 @@ main = do
            ])
     ]
   where
+    benchSetNums = [10, 100, 1000, 10000]
+
     conses funcs =
       [ env
         (sample i)
         (\p -> bench (title ++ ":" ++ show i) (whnf (\e -> func e p) 1))
-      | i <- [10, 100, 1000, 10000]
+      | i <- benchSetNums
       , Conser title sample func <- funcs
       ]
     snocs funcs =
       [ env
         (sample i)
         (\p -> bench (title ++ ":" ++ show i) (whnf (\e -> func p e) 1))
-      | i <- [10, 100, 1000, 10000]
+      | i <- benchSetNums
       , Snocer title sample func <- funcs
       ]
     appends funcs =
       [ env
         (payload i)
         (\p -> bench (title ++ ":" ++ show i) $ whnf (\x -> forcer (func x x)) p)
-      | i <- [10, 100, 1000, 10000]
+      | i <- benchSetNums
       , Append title payload func forcer <- funcs
       ]
     normalizations funcs =
       [ env
         (payload len)
         (\p -> bench (title ++ ":" ++ (show len)) $ nf id p)
-      | len <- [10, 100, 1000, 10000]
+      | len <- benchSetNums
       , Normalization title payload <- funcs
       ]
     indexes funcs =
       [ env
         payload
         (\p -> bench (title ++ ":" ++ show index) $ nf (\x -> func p x) index)
-      | index <- [10, 100, 1000, 10000]
+      | index <- benchSetNums
       , Indexing title payload func <- funcs
       ]
     lengths funcs =
       [ env
         (payload len)
         (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
-      | len <- [10, 100, 1000, 10000]
+      | len <- benchSetNums
       , Length title payload func <- funcs
       ]
     replicators funcs =
       [ bench (title ++ ":" ++ show i) $ nf (\(x, y) -> func x y) (i, 1234)
-      | i <- [10, 100, 1000, 10000]
+      | i <- benchSetNums
       , Replicator title func <- funcs
       ]
     mins funcs =
       [ env
         (payload len)
         (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
-      | len <- [10, 100, 1000, 10000]
+      | len <- benchSetNums
       , Min title payload func <- funcs
       ]
     maxs funcs =
       [ env
         (payload len)
         (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
-      | len <- [10, 100, 1000, 10000]
+      | len <- benchSetNums
       , Max title payload func <- funcs
       ]
     removeElems funcs =
@@ -248,7 +250,7 @@ main = do
         payload
         (\p ->
            bench (title ++ ":" ++ show relem) $ nf (\x -> func (/= relem) x) p)
-      | relem <- [1, 100, 1000, 10000 :: Int]
+      | relem <- benchSetNums
       , RemoveElement title payload func <- funcs
       ]
     removeByIndexes funcs =
@@ -257,14 +259,14 @@ main = do
         (\p ->
            bench (title ++ ":" ++ show relem) $
            nf (\x -> func (\index _ -> index /= relem) x) p)
-      | relem <- [1, 100, 1000, 10000 :: Int]
+      | relem <- benchSetNums
       , RemoveByIndex title payload func <- funcs
       ]
     sorts funcs =
       [ env
         (payload len)
         (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
-      | len <- [10, 100, 1000, 10000]
+      | len <- benchSetNums
       , Sort title payload func <- funcs
       ]
 
