@@ -52,7 +52,7 @@ main = do
            , Conser "Data.Vector.Storable" sampleSVVector SV.cons
            , Conser "Data.Sequence" sampleSeq (S.<|)
            , Conser "Data.RRBVector" sampleRRB (RRB.<|)
-           , Conser "Data.Acc" sampleAcc Acc.cons
+           , Conser "Acc" sampleAcc Acc.cons
            ])
     , bgroup
         "Snocing"
@@ -63,7 +63,7 @@ main = do
            , Snocer "Data.Vector.Storable" sampleSVVector SV.snoc
            , Snocer "Data.Sequence" sampleSeq (S.|>)
            , Snocer "Data.RRBVector" sampleRRB (RRB.|>)
-           , Snocer "Data.Acc" sampleAcc (flip Acc.snoc)
+           , Snocer "Acc" sampleAcc (flip Acc.snoc)
            ])
     , bgroup
         "Indexing"
@@ -87,7 +87,7 @@ main = do
            , Append "Data.Vector.Storable" sampleSVVector (SV.++) id
            , Append "Data.Sequence" sampleSeq (S.><) id
            , Append "Data.RRBVector" sampleRRB (RRB.><) id
-           , Append "Data.Acc" sampleAcc (<>) id
+           , Append "Acc" sampleAcc (<>) id
            ])
     , bgroup
         "Length"
@@ -100,7 +100,7 @@ main = do
            , Length "Data.Sequence" sampleSeq S.length
            , Length "Data.Massiv.Array" sampleMassivUArray M.elemsCount
            , Length "Data.RRBVector" sampleRRB length
-           , Length "Data.Acc" sampleAcc length
+           , Length "Acc" sampleAcc length
            ])
     , bgroup
         "Stable Sort"
@@ -133,7 +133,7 @@ main = do
            , Min "Data.Sequence" randomSampleSeq minimum
            , Min "Data.Massiv.Array" randomSampleMassivUArray M.minimum'
            , Min "Data.RRBVector" randomSampleRRB minimum
-           , Min "Data.Acc" randomSampleAcc minimum
+           , Min "Acc" randomSampleAcc minimum
            ])
     , bgroup
         "Max"
@@ -146,7 +146,7 @@ main = do
            , Max "Data.Sequence" randomSampleSeq maximum
            , Max "Data.Massiv.Array" randomSampleMassivUArray M.maximum'
            , Max "Data.RRBVector" randomSampleRRB maximum
-           , Max "Data.Acc" randomSampleAcc maximum
+           , Max "Acc" randomSampleAcc maximum
            ])
     , bgroup
         "Filter Element"
