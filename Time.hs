@@ -319,30 +319,33 @@ randomSampleRRB = randomSampleGen RRB.fromList
 randomSampleAcc :: Int -> IO (Acc.Acc Int)
 randomSampleAcc = randomSampleGen GHC.Exts.fromList
 
+
+sampleGen :: (NFData a, Num i, Enum i) => ([i] -> a) -> i -> IO a
+sampleGen conv i = evaluate $ force $ conv [1..i]
+
 sampleList :: Int -> IO [Int]
-sampleList i = evaluate $ force [1..i]
+sampleList = sampleGen id
 
 sampleDList :: Int -> IO (D.DList Int)
-sampleDList i = evaluate $ force $ D.fromList [1..i]
+sampleDList = sampleGen D.fromList
+
 sampleVector :: Int -> IO (V.Vector Int)
-sampleVector i = evaluate $ force $ V.fromList [1..i]
+sampleVector = sampleGen V.fromList
 
 sampleUVVector :: Int -> IO (UV.Vector Int)
-sampleUVVector i = evaluate $ force $ UV.fromList [1..i]
+sampleUVVector = sampleGen UV.fromList
 
 sampleSVVector :: Int -> IO (SV.Vector Int)
-sampleSVVector i = evaluate $ force $ SV.fromList [1..i]
+sampleSVVector = sampleGen SV.fromList
 
 sampleSeq :: Int -> IO (S.Seq Int)
-sampleSeq i = evaluate $ force $ S.fromList [1..i]
+sampleSeq = sampleGen S.fromList
 
 sampleMassivUArray :: Int -> IO (M.Array M.U Int Int)
-sampleMassivUArray i = evaluate $ force ma where
-  ma :: M.Array M.U Int Int
-  ma =  M.fromList M.Seq [1..i]
+sampleMassivUArray = sampleGen (M.fromList M.Seq)
 
 sampleRRB :: Int -> IO (RRB.Vector Int)
-sampleRRB i = evaluate $ force $ RRB.fromList [1..i]
+sampleRRB = sampleGen RRB.fromList
 
 sampleAcc :: Int -> IO (Acc.Acc Int)
-sampleAcc i = evaluate $ force $ GHC.Exts.fromList [1..i]
+sampleAcc = sampleGen GHC.Exts.fromList
