@@ -289,33 +289,35 @@ sortSVec vec =
         V.sort mv
         SV.unsafeFreeze mv)
 
+randomSampleGen :: (NFData a, Random i) => ([i] -> a) -> Int -> IO a
+randomSampleGen conv i = evaluate $ force $ conv $ take i $ randoms $ mkStdGen 0
+
 randomSampleList :: Int -> IO [Int]
-randomSampleList i = evaluate $ force (take i (randoms (mkStdGen 0)))
+randomSampleList = randomSampleGen id
 
 randomSampleDList :: Int -> IO (D.DList Int)
-randomSampleDList i = evaluate $ force $ D.fromList (take i (randoms (mkStdGen 0)))
+randomSampleDList = randomSampleGen D.fromList
 
 randomSampleVector :: Int -> IO (V.Vector Int)
-randomSampleVector i = evaluate $ force $ V.fromList (take i (randoms (mkStdGen 0)))
+randomSampleVector = randomSampleGen V.fromList
 
 randomSampleUVVector :: Int -> IO (UV.Vector Int)
-randomSampleUVVector i = evaluate $ force $ UV.fromList (take i (randoms (mkStdGen 0)))
+randomSampleUVVector = randomSampleGen UV.fromList
 
 randomSampleSVVector :: Int -> IO (SV.Vector Int)
-randomSampleSVVector i = evaluate $ force $ SV.fromList (take i (randoms (mkStdGen 0)))
+randomSampleSVVector = randomSampleGen SV.fromList
 
 randomSampleSeq :: Int -> IO (S.Seq Int)
-randomSampleSeq i = evaluate $ force $ S.fromList (take i (randoms (mkStdGen 0)))
+randomSampleSeq = randomSampleGen S.fromList
 
 randomSampleMassivUArray :: Int -> IO (M.Array M.U Int Int)
-randomSampleMassivUArray i = evaluate $ force ma where
-  ma = M.fromList M.Seq (take i (randoms (mkStdGen 0)))
+randomSampleMassivUArray = randomSampleGen (M.fromList M.Seq)
 
 randomSampleRRB :: Int -> IO (RRB.Vector Int)
-randomSampleRRB i = evaluate $ force $ RRB.fromList (take i (randoms (mkStdGen 0)))
+randomSampleRRB = randomSampleGen RRB.fromList
 
 randomSampleAcc :: Int -> IO (Acc.Acc Int)
-randomSampleAcc i = evaluate $ force $ GHC.Exts.fromList (take i (randoms (mkStdGen 0)))
+randomSampleAcc = randomSampleGen GHC.Exts.fromList
 
 sampleList :: Int -> IO [Int]
 sampleList i = evaluate $ force [1..i]
