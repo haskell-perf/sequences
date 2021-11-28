@@ -28,6 +28,7 @@ data Snocer = forall f. NFData (f Int) => Snocer String (Int -> IO (f Int)) (f I
 data Append = forall f. NFData (f Int) => Append String (Int -> IO (f Int)) (f Int -> f Int -> f Int) (f Int -> f Int)
 data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
 data Indexing = forall f. NFData (f Int) => Indexing String (IO (f Int)) (f Int -> Int -> Int)
+data Normalization = forall f. NFData (f Int) => Normalization String (Int -> IO (f Int))
 data Length = forall f. NFData (f Int) => Length String (Int -> IO (f Int)) (f Int -> Int)
 data Min = forall f. NFData (f Int) => Min String (Int -> IO (f Int)) (f Int -> Int)
 data Max = forall f. NFData (f Int) => Max String (Int -> IO (f Int)) (f Int -> Int)
@@ -88,6 +89,19 @@ main = do
            , Append "Data.Sequence" sampleSeq (S.><) id
            , Append "Data.RRBVector" sampleRRB (RRB.><) id
            , Append "Acc" sampleAcc (<>) id
+           ])
+    , bgroup
+        "Normalization"
+        (normalizations
+           [ Normalization "Data.List" sampleList
+           , Normalization "Data.DList" sampleDList
+           , Normalization "Data.Vector" sampleVector
+           , Normalization "Data.Vector.Unboxed" sampleUVVector
+           , Normalization "Data.Vector.Storable" sampleSVVector
+           , Normalization "Data.Sequence" sampleSeq
+           , Normalization "Data.Massiv.Array" sampleMassivUArray
+           , Normalization "Data.RRBVector" sampleRRB
+           , Normalization "Data.Acc" sampleAcc
            ])
     , bgroup
         "Length"
@@ -212,6 +226,13 @@ main = do
         (\p -> bench (title ++ ":" ++ show index) $ nf (\x -> func p x) index)
       | index <- [10, 100, 1000, 10000]
       , Indexing title payload func <- funcs
+      ]
+    normalizations funcs =
+      [ env
+        (payload len)
+        (\p -> bench (title ++ ":" ++ (show len)) $ nf id p)
+      | len <- [10, 100, 1000, 10000]
+      , Normalization title payload <- funcs
       ]
     lengths funcs =
       [ env
