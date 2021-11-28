@@ -23,16 +23,16 @@ import qualified GHC.Exts
 import           System.Directory
 import           System.Random
 
-data Conser = forall f. NFData (f Int) => Conser String (Int -> IO (f Int)) (Int -> f Int -> f Int)
-data Snocer = forall f. NFData (f Int) => Snocer String (Int -> IO (f Int)) (f Int -> Int -> f Int)
-data Append = forall f. NFData (f Int) => Append String (Int -> IO (f Int)) (f Int -> f Int -> f Int) (f Int -> f Int)
-data Replicator = forall f. NFData (f Int) => Replicator String (Int -> Int -> f Int)
-data Indexing = forall f. NFData (f Int) => Indexing String (IO (f Int)) (f Int -> Int -> Int)
+data Conser        = forall f. NFData (f Int) => Conser        String (Int -> IO (f Int)) (Int -> f Int -> f Int)
+data Snocer        = forall f. NFData (f Int) => Snocer        String (Int -> IO (f Int)) (f Int -> Int -> f Int)
+data Append        = forall f. NFData (f Int) => Append        String (Int -> IO (f Int)) (f Int -> f Int -> f Int) (f Int -> f Int)
+data Replicator    = forall f. NFData (f Int) => Replicator    String (Int -> Int -> f Int)
+data Indexing      = forall f. NFData (f Int) => Indexing      String (IO (f Int)) (f Int -> Int -> Int)
 data Normalization = forall f. NFData (f Int) => Normalization String (Int -> IO (f Int))
-data Length = forall f. NFData (f Int) => Length String (Int -> IO (f Int)) (f Int -> Int)
-data Min = forall f. NFData (f Int) => Min String (Int -> IO (f Int)) (f Int -> Int)
-data Max = forall f. NFData (f Int) => Max String (Int -> IO (f Int)) (f Int -> Int)
-data Sort = forall f. NFData (f Int) => Sort String (Int -> IO (f Int)) (f Int -> f Int)
+data Length        = forall f. NFData (f Int) => Length        String (Int -> IO (f Int)) (f Int -> Int)
+data Min           = forall f. NFData (f Int) => Min           String (Int -> IO (f Int)) (f Int -> Int)
+data Max           = forall f. NFData (f Int) => Max           String (Int -> IO (f Int)) (f Int -> Int)
+data Sort          = forall f. NFData (f Int) => Sort          String (Int -> IO (f Int)) (f Int -> f Int)
 data RemoveElement = forall f. NFData (f Int) => RemoveElement String (IO (f Int)) ((Int -> Bool) -> f Int -> f Int)
 data RemoveByIndex = forall f. NFData (f Int) => RemoveByIndex String (IO (f Int)) ((Int -> Int -> Bool) -> f Int -> f Int)
 
