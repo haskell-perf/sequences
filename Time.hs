@@ -67,18 +67,6 @@ main = do
            , Snocer "Acc"                  sampleAcc      (flip Acc.snoc)
            ])
     , bgroup
-        "Indexing"
-        (let size = 10005 in
-         indexes
-           [ Indexing "Data.List"            (sampleList         size) (L.!!)
-           , Indexing "Data.Vector"          (sampleVector       size) (V.!)
-           , Indexing "Data.Vector.Unboxed"  (sampleUVVector     size) (UV.!)
-           , Indexing "Data.Vector.Storable" (sampleSVVector     size) (SV.!)
-           , Indexing "Data.Sequence"        (sampleSeq          size) S.index
-           , Indexing "Data.Massiv.Array"    (sampleMassivUArray size) M.index'
-           , Indexing "Data.RRBVector"       (sampleRRB          size) (RRB.!)
-           ])
-    , bgroup
         "Append"
         (appends
            [ Append "Data.List"            sampleList     (++)      force
@@ -104,6 +92,18 @@ main = do
            , Normalization "Data.Acc"             sampleAcc
            ])
     , bgroup
+        "Indexing"
+        (let size = 10005 in
+         indexes
+           [ Indexing "Data.List"            (sampleList         size) (L.!!)
+           , Indexing "Data.Vector"          (sampleVector       size) (V.!)
+           , Indexing "Data.Vector.Unboxed"  (sampleUVVector     size) (UV.!)
+           , Indexing "Data.Vector.Storable" (sampleSVVector     size) (SV.!)
+           , Indexing "Data.Sequence"        (sampleSeq          size) S.index
+           , Indexing "Data.Massiv.Array"    (sampleMassivUArray size) M.index'
+           , Indexing "Data.RRBVector"       (sampleRRB          size) (RRB.!)
+           ])
+    , bgroup
         "Length"
         (lengths
            [ Length "Data.List"            sampleList         L.length
@@ -115,15 +115,6 @@ main = do
            , Length "Data.Massiv.Array"    sampleMassivUArray M.elemsCount
            , Length "Data.RRBVector"       sampleRRB          length
            , Length "Acc"                  sampleAcc          length
-           ])
-    , bgroup
-        "Stable Sort"
-        (sorts
-           [ Sort "Data.List"            randomSampleList     L.sort
-           , Sort "Data.Vector"          randomSampleVector   sortVec
-           , Sort "Data.Vector.Unboxed"  randomSampleUVVector sortUVec
-           , Sort "Data.Vector.Storable" randomSampleSVVector sortSVec
-           , Sort "Data.Sequence"        randomSampleSeq      S.sort
            ])
     , bgroup
         "Replicate"
@@ -180,15 +171,17 @@ main = do
            , RemoveByIndex "Data.Vector.Unboxed"  (sampleUVVector size) UV.ifilter
            , RemoveByIndex "Data.Vector.Storable" (sampleSVVector size) SV.ifilter
            ])
+    , bgroup
+        "Stable Sort"
+        (sorts
+           [ Sort "Data.List"            randomSampleList     L.sort
+           , Sort "Data.Vector"          randomSampleVector   sortVec
+           , Sort "Data.Vector.Unboxed"  randomSampleUVVector sortUVec
+           , Sort "Data.Vector.Storable" randomSampleSVVector sortSVec
+           , Sort "Data.Sequence"        randomSampleSeq      S.sort
+           ])
     ]
   where
-    appends funcs =
-      [ env
-        (payload i)
-        (\p -> bench (title ++ ":" ++ show i) $ whnf (\x -> forcer (func x x)) p)
-      | i <- [10, 100, 1000, 10000]
-      , Append title payload func forcer <- funcs
-      ]
     conses funcs =
       [ env
         (sample i)
@@ -203,17 +196,12 @@ main = do
       | i <- [10, 100, 1000, 10000]
       , Snocer title sample func <- funcs
       ]
-    replicators funcs =
-      [ bench (title ++ ":" ++ show i) $ nf (\(x, y) -> func x y) (i, 1234)
-      | i <- [10, 100, 1000, 10000]
-      , Replicator title func <- funcs
-      ]
-    indexes funcs =
+    appends funcs =
       [ env
-        payload
-        (\p -> bench (title ++ ":" ++ show index) $ nf (\x -> func p x) index)
-      | index <- [10, 100, 1000, 10000]
-      , Indexing title payload func <- funcs
+        (payload i)
+        (\p -> bench (title ++ ":" ++ show i) $ whnf (\x -> forcer (func x x)) p)
+      | i <- [10, 100, 1000, 10000]
+      , Append title payload func forcer <- funcs
       ]
     normalizations funcs =
       [ env
@@ -222,12 +210,24 @@ main = do
       | len <- [10, 100, 1000, 10000]
       , Normalization title payload <- funcs
       ]
+    indexes funcs =
+      [ env
+        payload
+        (\p -> bench (title ++ ":" ++ show index) $ nf (\x -> func p x) index)
+      | index <- [10, 100, 1000, 10000]
+      , Indexing title payload func <- funcs
+      ]
     lengths funcs =
       [ env
         (payload len)
         (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
       | len <- [10, 100, 1000, 10000]
       , Length title payload func <- funcs
+      ]
+    replicators funcs =
+      [ bench (title ++ ":" ++ show i) $ nf (\(x, y) -> func x y) (i, 1234)
+      | i <- [10, 100, 1000, 10000]
+      , Replicator title func <- funcs
       ]
     mins funcs =
       [ env
@@ -242,13 +242,6 @@ main = do
         (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
       | len <- [10, 100, 1000, 10000]
       , Max title payload func <- funcs
-      ]
-    sorts funcs =
-      [ env
-        (payload len)
-        (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
-      | len <- [10, 100, 1000, 10000]
-      , Sort title payload func <- funcs
       ]
     removeElems funcs =
       [ env
@@ -266,6 +259,13 @@ main = do
            nf (\x -> func (\index _ -> index /= relem) x) p)
       | relem <- [1, 100, 1000, 10000 :: Int]
       , RemoveByIndex title payload func <- funcs
+      ]
+    sorts funcs =
+      [ env
+        (payload len)
+        (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+      | len <- [10, 100, 1000, 10000]
+      , Sort title payload func <- funcs
       ]
 
 sortVec :: V.Vector Int -> V.Vector Int
