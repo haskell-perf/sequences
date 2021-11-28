@@ -185,88 +185,77 @@ main = do
     benchSetNums = [10, 100, 1000, 10000]
     bench' :: String -> Int -> Benchmarkable -> Benchmark
     bench' title i = bench (title ++ ":" ++ show i)
+    benchEnv :: NFData a => String -> (a -> Benchmarkable) -> (Int -> IO a) -> Int -> Benchmark
+    benchEnv t g f i =
+      env
+        (f i)
+        (bench' t i . g)
 
     conses funcs =
-      [ env
-        (sample i)
-        (\p -> bench' title i $ whnf (\e -> func e p) 1)
+      [ benchEnv title ((`whnf` 1) . flip func) mkSample i
       | i <- benchSetNums
-      , Conser title sample func <- funcs
+      , Conser title mkSample func <- funcs
       ]
     snocs funcs =
-      [ env
-        (sample i)
-        (\p -> bench' title i $ whnf (\e -> func p e) 1)
+      [ benchEnv title ((`whnf` 1) . func) mkSample i
       | i <- benchSetNums
-      , Snocer title sample func <- funcs
+      , Snocer title mkSample func <- funcs
       ]
     appends funcs =
-      [ env
-        (payload i)
-        (\p -> bench' title i $ whnf (\x -> forcer (func x x)) p)
+      [ benchEnv title (whnf (forcer . join func)) mkSample i
       | i <- benchSetNums
-      , Append title payload func forcer <- funcs
+      , Append title mkSample func forcer <- funcs
       ]
     normalizations funcs =
-      [ env
-        (payload len)
-        (\p -> bench' title len $ nf id p)
+      [ benchEnv title (nf id) mkSample len
       | len <- benchSetNums
-      , Normalization title payload <- funcs
+      , Normalization title mkSample <- funcs
       ]
     indexes funcs =
       [ env
         payload
-        (\p -> bench' title index $ nf (\x -> func p x) index)
+        (bench' title index . (`nf` index) . func)
       | index <- benchSetNums
       , Indexing title payload func <- funcs
       ]
     lengths funcs =
-      [ env
-        (payload len)
-        (\p -> bench' title len $ nf (\x -> func x) p)
+      [ benchEnv title (nf func) mkSample len
       | len <- benchSetNums
-      , Length title payload func <- funcs
+      , Length title mkSample func <- funcs
       ]
     replicators funcs =
-      [ bench' title i $ nf (\(x, y) -> func x y) (i, 1234)
+      [ bench' title i $ nf (uncurry func) (i, 1234)
       | i <- benchSetNums
       , Replicator title func <- funcs
       ]
     mins funcs =
-      [ env
-        (payload len)
-        (\p -> bench' title len $ nf (\x -> func x) p)
+      [ benchEnv title (nf func) mkSample len
       | len <- benchSetNums
-      , Min title payload func <- funcs
+      , Min title mkSample func <- funcs
       ]
     maxs funcs =
-      [ env
-        (payload len)
-        (\p -> bench' title len $ nf (\x -> func x) p)
+      [ benchEnv title (nf func) mkSample len
       | len <- benchSetNums
-      , Max title payload func <- funcs
+      , Max title mkSample func <- funcs
       ]
     removeElems funcs =
       [ env
         payload
-        (\p -> bench' title relem $ nf (\x -> func (/= relem) x) p)
+        (bench' title relem . nf (func (relem /=)))
       | relem <- benchSetNums
       , RemoveElement title payload func <- funcs
       ]
     removeByIndexes funcs =
       [ env
         payload
-        (\p -> bench' title relem $ nf (\x -> func (\index _ -> index /= relem) x) p)
+        (bench' title relem . nf (func $ const (relem /=)))
       | relem <- benchSetNums
       , RemoveByIndex title payload func <- funcs
       ]
     sorts funcs =
-      [ env
-        (payload len)
-        (\p -> bench' title len $ nf (\x -> func x) p)
+      [ benchEnv title (nf func) mkSample len
       | len <- benchSetNums
-      , Sort title payload func <- funcs
+      , Sort title mkSample func <- funcs
       ]
 
 sortVec :: V.Vector Int -> V.Vector Int
