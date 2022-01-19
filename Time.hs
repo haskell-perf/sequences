@@ -5,10 +5,8 @@ module Main (main) where
 
 import           Control.DeepSeq
 import           Control.Exception (evaluate)
-import           Control.Monad
 import           Control.Monad.ST
-import           Criterion.Main
-import           Criterion.Types
+import           Data.Maybe
 import qualified Data.List as L
 import qualified Data.DList as D
 import qualified Data.Sequence as S
@@ -20,8 +18,12 @@ import qualified Data.Massiv.Array as M
 import qualified Data.RRBVector as RRB
 import qualified Acc
 import qualified GHC.Exts
-import           System.Directory
+import           System.Exit
 import           System.Random
+import           Test.Tasty.Bench
+import           Test.Tasty.Ingredients
+import           Test.Tasty.Options
+import           Test.Tasty.Runners
 
 data Conser = forall f. NFData (f Int) => Conser String (Int -> IO (f Int)) (Int -> f Int -> f Int)
 data Snocer = forall f. NFData (f Int) => Snocer String (Int -> IO (f Int)) (f Int -> Int -> f Int)
@@ -37,12 +39,14 @@ data RemoveByIndex = forall f. NFData (f Int) => RemoveByIndex String (IO (f Int
 
 main :: IO ()
 main = do
-  let fp = "out.csv"
-  exists <- doesFileExist fp
-  when exists (removeFile fp)
-  defaultMainWith
-    defaultConfig {csvFile = Just fp}
-    [ bgroup
+  opts <- parseOptions benchIngredients benchmarks
+  let opts' = changeOption (Just . fromMaybe (CsvPath "out.csv")) opts
+  case tryIngredients benchIngredients opts' benchmarks of
+    Nothing -> exitFailure
+    Just mb -> mb >>= \b -> if b then exitSuccess else exitFailure
+  where
+    benchmarks = bgroup "All"
+      [ bgroup
         "Consing"
         (conses
            [ Conser "Data.List" sampleList (:)
@@ -54,7 +58,7 @@ main = do
            , Conser "Data.RRBVector" sampleRRB (RRB.<|)
            , Conser "Data.Acc" sampleAcc Acc.cons
            ])
-    , bgroup
+      , bgroup
         "Snocing"
         (snocs
            [ Snocer "Data.DList" sampleDList D.snoc
@@ -65,7 +69,7 @@ main = do
            , Snocer "Data.RRBVector" sampleRRB (RRB.|>)
            , Snocer "Data.Acc" sampleAcc (flip Acc.snoc)
            ])
-    , bgroup
+      , bgroup
         "Indexing"
         (let size = 10005
          in indexes
@@ -77,7 +81,7 @@ main = do
               , Indexing "Data.Massiv.Array" (sampleMassivUArray size) M.index'
               , Indexing "Data.RRBVector" (sampleRRB size) (RRB.!)
               ])
-    , bgroup
+      , bgroup
         "Append"
         (appends
            [ Append "Data.List" sampleList (++) force
@@ -89,7 +93,7 @@ main = do
            , Append "Data.RRBVector" sampleRRB (RRB.><) id
            , Append "Data.Acc" sampleAcc (<>) id
            ])
-    , bgroup
+      , bgroup
         "Length"
         (lengths
            [ Length "Data.List" sampleList L.length
@@ -102,7 +106,7 @@ main = do
            , Length "Data.RRBVector" sampleRRB length
            , Length "Data.Acc" sampleAcc length
            ])
-    , bgroup
+      , bgroup
         "Stable Sort"
         (sorts
            [ Sort "Data.List" randomSampleList L.sort
@@ -111,7 +115,7 @@ main = do
            , Sort "Data.Vector.Storable" randomSampleSVVector sortSVec
            , Sort "Data.Sequence" randomSampleSeq S.sort
            ])
-    , bgroup
+      , bgroup
         "Replicate"
         (replicators
            [ Replicator "Data.List" L.replicate
@@ -122,7 +126,7 @@ main = do
            , Replicator "Data.Sequence" S.replicate
            , Replicator "Data.RRBVector" RRB.replicate
            ])
-    , bgroup
+      , bgroup
         "Min"
         (mins
            [ Min "Data.List" randomSampleList L.minimum
@@ -135,7 +139,7 @@ main = do
            , Min "Data.RRBVector" randomSampleRRB minimum
            , Min "Data.Acc" randomSampleAcc minimum
            ])
-    , bgroup
+      , bgroup
         "Max"
         (maxs
            [ Max "Data.List" randomSampleList L.maximum
@@ -148,7 +152,7 @@ main = do
            , Max "Data.RRBVector" randomSampleRRB maximum
            , Max "Data.Acc" randomSampleAcc maximum
            ])
-    , bgroup
+      , bgroup
         "Filter Element"
         (let size = 10005
          in removeElems
@@ -164,7 +168,7 @@ main = do
                   SV.filter
               , RemoveElement "Data.Sequence" (sampleSeq size) S.filter
               ])
-    , bgroup
+      , bgroup
         "Filter By Index"
         (let size = 10005
          in removeByIndexes
@@ -178,66 +182,73 @@ main = do
                   (sampleSVVector size)
                   SV.ifilter
               ])
-    ]
-  where
+      ]
+
+    bench' groupTitle title i
+      | title == "Data.Vector"
+      = bench (title ++ ":" ++ show i)
+      | otherwise
+      = bcompare ("$NF == \"Data.Vector:" ++ show i ++ "\" && $(NF-1) == \"" ++ groupTitle ++ "\"")
+      . bench (title ++ ":" ++ show i)
+
     appends funcs =
       [ env
         (payload i)
-        (\p -> bench (title ++ ":" ++ show i) $ whnf (\x -> forcer (func x x)) p)
+        (\p -> bench' "Append" title i $ whnf (\x -> forcer (func x x)) p)
       | i <- [10, 100, 1000, 10000]
       , Append title payload func forcer <- funcs
       ]
     conses funcs =
       [ env
         (sample i)
-        (\p -> bench (title ++ ":" ++ show i) (whnf (\e -> func e p) 1))
-      | i <- [10, 100, 1000, 10000]
+        (\p -> bench' "Consing" title i (whnf (\e -> func e p) 1))
+      | i <- [10 , 100, 1000, 10000]
       , Conser title sample func <- funcs
       ]
     snocs funcs =
       [ env
         (sample i)
-        (\p -> bench (title ++ ":" ++ show i) (whnf (\e -> func p e) 1))
+        (\p -> bench' "Snocing" title i (whnf (\e -> func p e) 1))
       | i <- [10, 100, 1000, 10000]
       , Snocer title sample func <- funcs
       ]
     replicators funcs =
-      [ bench (title ++ ":" ++ show i) $ nf (\(x, y) -> func x y) (i, 1234)
+      [ bench' "Replicate" title i $ nf (\(x, y) -> func x y) (i, 1234)
       | i <- [10, 100, 1000, 10000]
       , Replicator title func <- funcs
       ]
     indexes funcs =
       [ env
         payload
-        (\p -> bench (title ++ ":" ++ show index) $ nf (\x -> func p x) index)
+        (\p -> bench' "Indexing" title index $ nf (\x -> func p x) index)
       | index <- [10, 100, 1000, 10000]
       , Indexing title payload func <- funcs
       ]
     lengths funcs =
       [ env
         (payload len)
-        (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+        (\p -> bench' "Length" title  len $ nf (\x -> func x) p)
       | len <- [10, 100, 1000, 10000]
       , Length title payload func <- funcs
       ]
     mins funcs =
       [ env
         (payload len)
-        (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+        (\p -> bench' "Min" title len $ nf (\x -> func x) p)
       | len <- [10, 100, 1000, 10000]
       , Min title payload func <- funcs
       ]
     maxs funcs =
       [ env
         (payload len)
-        (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+        (\p -> bench' "Max" title len $ nf (\x -> func x) p)
       | len <- [10, 100, 1000, 10000]
       , Max title payload func <- funcs
       ]
     sorts funcs =
       [ env
         (payload len)
-        (\p -> bench (title ++ ":" ++ (show len)) $ nf (\x -> func x) p)
+        (\p -> bench' "Stable Sort" title len $ nf (\x -> func x) p)
       | len <- [10, 100, 1000, 10000]
       , Sort title payload func <- funcs
       ]
@@ -245,7 +256,7 @@ main = do
       [ env
         payload
         (\p ->
-           bench (title ++ ":" ++ show relem) $ nf (\x -> func (/= relem) x) p)
+           bench' "Filter Element" title relem $ nf (\x -> func (/= relem) x) p)
       | relem <- [1, 100, 1000, 10000 :: Int]
       , RemoveElement title payload func <- funcs
       ]
@@ -253,7 +264,7 @@ main = do
       [ env
         payload
         (\p ->
-           bench (title ++ ":" ++ show relem) $
+           bench' "Filter By Index" title relem $
            nf (\x -> func (\index _ -> index /= relem) x) p)
       | relem <- [1, 100, 1000, 10000 :: Int]
       , RemoveByIndex title payload func <- funcs

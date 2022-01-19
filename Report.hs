@@ -35,13 +35,13 @@ reportFromCsv fp = do
               (filter
                  (not . all (all null))
                  (groupBy
-                    (on (==) (takeWhile (/= '/') . concat . take 1))
+                    (on (==) (takeWhile (/= '.') . stripAll . concat . take 1))
                     rows))))
     _ -> error "Couldn't parse csv"
 
 format :: [[String]] -> String
 format rows =
-  ("## " ++ takeWhile (/= '/') (concat (concat (take 1 (drop 1 rows))))) ++
+  ("## " ++ takeWhile (/= '.') (stripAll (concat (concat (take 1 (drop 1 rows)))))) ++
   "\n\n" ++
   unlines
     [ "|Name|" ++ intercalate "|" scales ++ "|"
@@ -73,15 +73,20 @@ format rows =
       let s =
             takeWhile
               (/= ':')
-              (dropWhile (== '/') (dropWhile (/= '/') (concat (take 1 row))))
+              (dropWhile (== '.') (dropWhile (/= '.') (stripAll (concat (take 1 row)))))
       in s
     rowScale row =
       let scale = dropWhile (== ':') (dropWhile (/= ':') (concat (take 1 row)))
       in scale
 
+-- | Strip "All." prefix.
+stripAll :: String -> String
+stripAll = drop 4
+
+-- | Inputs are in picoseconds, so scaling by 1e-12.
 float :: [Double] -> Double -> String
-float others x = let (scale, ext) = secs (mean others)
-                 in with (x * scale) ext
+float others x = let (scale, ext) = secs (mean others * 1e-12)
+                 in with (x * 1e-12 * scale) ext
 
 -- | Convert a number of seconds to a string.  The string will consist
 -- of four decimal places, followed by a short description of the time
